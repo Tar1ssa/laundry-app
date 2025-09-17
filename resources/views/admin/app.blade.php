@@ -11,6 +11,7 @@
   <meta name="description" content="Mantis is made using Bootstrap 5 design framework. Download the free admin template & use it for your project.">
   <meta name="keywords" content="Mantis, Dashboard UI Kit, Bootstrap 5, Admin Template, Admin Dashboard, CRM, CMS, Bootstrap Admin Template">
   <meta name="author" content="CodedThemes">
+  @yield('dependencies')
 
   <!-- [Favicon] icon -->
   <link rel="icon" href="{{ asset('/assets/asset/images/favicon.svg') }}" type="image/x-icon"> <!-- [Google Font] Family -->
@@ -56,6 +57,8 @@
     @yield('content')
 
   </div>
+
+  @yield('modal-create')
   <!-- [ Main Content ] end -->
 
   @include('admin.inc.footer')
@@ -94,7 +97,7 @@
 
   <script>font_change("Public-Sans");</script>
 
-
+  @yield('js')
 
 </body>
 <!-- [Body] end -->
