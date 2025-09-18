@@ -33,6 +33,7 @@
 <!-- [Body] Start -->
 
 <body data-pc-preset="preset-1" data-pc-direction="ltr" data-pc-theme="light">
+
   <!-- [ Pre-loader ] start -->
 <div class="loader-bg">
   <div class="loader-track">
@@ -53,17 +54,19 @@
 
 
   <!-- [ Main Content ] start -->
+
   <div class="pc-container">
     @yield('content')
 
   </div>
 
   @yield('modal-create')
+  @yield('modal-edit')
   <!-- [ Main Content ] end -->
 
   @include('admin.inc.footer')
 
-
+  @include('sweetalert::alert')
   <!-- [Page Specific JS] start -->
   <script src="{{ asset('/assets/asset/js/plugins/apexcharts.min.js') }}"></script>
   <script src="{{ asset('/assets/asset/js/pages/dashboard-default.js') }}"></script>

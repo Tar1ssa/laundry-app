@@ -25,12 +25,12 @@
           <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-stack-2"></i></span><span class="pc-mtext">Master Data</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
           <ul class="pc-submenu">
             <li class="pc-item"><a class="pc-link" href="#!">Customer</a></li>
-            <li class="pc-item"><a class="pc-link" href="#!">Jenis Service</a></li>
+            <li class="pc-item"><a class="pc-link" href="{{ route('service.index') }}">Jenis Service</a></li>
             <li class="pc-item pc-hasmenu">
               <a href="#!" class="pc-link">User<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
               <ul class="pc-submenu">
                 <li class="pc-item"><a class="pc-link" href="{{ route('user.index') }}">Users</a></li>
-                <li class="pc-item"><a class="pc-link" href="#!">Levels</a></li>
+                <li class="pc-item"><a class="pc-link" href="{{ route('level.index') }}">Levels</a></li>
               </ul>
             </li>
           </ul>

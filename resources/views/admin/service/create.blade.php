@@ -8,8 +8,8 @@
               <div class="col-md-12">
                 <ul class="breadcrumb">
                   <li class="breadcrumb-item"><a href="#">Master Data</a></li>
-                  <li class="breadcrumb-item"><a href="#">User</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Tambah User</li>
+                  <li class="breadcrumb-item"><a href="#">Jenis Service</a></li>
+                  <li class="breadcrumb-item" aria-current="page">Tambah Jenis Service</li>
                 </ul>
               </div>
               <div class="col-md-12">
@@ -28,50 +28,43 @@
           <div class="col-md-12">
             <div class="card">
               <div class="card-header">
-                <h3>Tambah User</h3>
+                <h3>Tambah Jenis Service</h3>
               </div>
               <div class="card-body">
-                <form action="{{ route('user.store') }}" method="post">
+                <form action="{{ route('service.store') }}" method="post">
                     @csrf
                     <div class="row">
                         <div class="col-md-6">
-                                <div class="mb-3">
+                                 <div class="mb-3">
                                     <div class="form-floating ">
                                         <input value="{{ old('name') }}" type="text" class="form-control" id="floatingName" placeholder="Nama" name="name">
-                                        <label for="floatingName">Nama</label>
+                                        <label for="floatingName">Nama Service</label>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3 ">
+                                    <label for="floatingEmail">Harga</label>
+                                    <div class="d-flex flex-row">
+                                        <div class="input-group-text">Rp.</div>
+                                        <input type="number" name="price" class="form-control" id="inlineFormInputGroupUsername" placeholder="Masukkan harga">
+                                        <div class="input-group-text">per kg</div>
                                     </div>
                                 </div>
 
                                 <div class="mb-3">
-                                    <div class="form-floating ">
-                                        <input value="{{ old('email') }}" type="email" class="form-control" id="floatingEmail" placeholder="Email" name="email">
-                                        <label for="floatingEmail">Alamat Email</label>
+                                    <div class="form-group">
+                                        <label class="form-label" for="exampleFormControlTextarea1">Deskripsi</label>
+                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="description">{{ old('description') }}</textarea>
                                     </div>
                                 </div>
 
-                                <div class="mb-3">
-                                    <div class="form-floating ">
-                                        <input value="{{ old('password') }}" type="password" class="form-control" id="floatingPassword" placeholder="Password" name="password">
-                                        <label for="floatingPassword">Password</label>
-                                    </div>
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="">Level User</label>
-                                    <select name="level" class="mb-0 form-select">
-                                        <option selected disabled>--Pilih Level--</option>
-                                        @foreach ($levels as $keylevel)
-                                            <option value="{{ $keylevel->id }}">{{ $keylevel->level_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
                         </div>
                         <div class="col-md-6 d-flex justify-content-center align-items-center">
-                            <i class="ti ti-user-plus font-size-icon text-blue-500"></i>
+                            <i class="ti ti-businessplan font-size-icon text-blue-500"></i>
                         </div>
                     </div>
                     <button type="submit" class="btn btn-shadow btn-primary">Submit</button>
-                    <a href="{{ route('user.index') }}" class="btn btn-shadow btn-secondary">Kembali</a>
+                    <a href="{{ route('service.index') }}" class="btn btn-shadow btn-secondary">Kembali</a>
                   </div>
                 </form>
               </div>

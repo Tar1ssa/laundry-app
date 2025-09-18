@@ -13,8 +13,8 @@
               <div class="col-md-12">
                 <ul class="breadcrumb">
                   <li class="breadcrumb-item"><a href="#">Master Data</a></li>
-                  <li class="breadcrumb-item"><a href="#">User</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Users</li>
+                  <li class="breadcrumb-item"><a href="#">Level</a></li>
+                  <li class="breadcrumb-item" aria-current="page">Levels</li>
                 </ul>
               </div>
               <div class="col-md-12">
@@ -32,9 +32,9 @@
           <div class="col-sm-12">
             <div class="card">
               <div class="card-header d-flex justify-content-between">
-                <h3>Data Users</h3>
-                <a href="{{ route('user.create') }}" class="btn btn-shadow btn-primary">Tambah User</a>
-                {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah User</button> --}}
+                <h3>Data Level</h3>
+                <a href="{{ route('level.create') }}" class="btn btn-shadow btn-primary">Tambah Level</a>
+                {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah Level</button> --}}
               </div>
               <div class="card-body">
                 <div class="dt-responsive table-responsive">
@@ -42,33 +42,21 @@
                     <thead>
                       <tr>
                         <th>No.</th>
-                        <th>Nama depan</th>
-                        <th>Nama belakang</th>
-                        <th>E-mail</th>
-                        <th>Level</th>
+                        <th>Nama Level</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $index => $datauser)
-                        @php
-
-                            $parts = explode(' ', $datauser['name']);
-                            $first = array_shift($parts);
-                            $last = implode(' ', $parts);
-                        @endphp
+                        @foreach ($levels as $index => $dataLevel)
                       <tr>
                         <td>{{ $index +=1 }}</td>
-                        <td>{{ $first}}</td>
-                        <td>{{ $last }}</td>
-                        <td>{{ $datauser['email'] }}</td>
-                        <td>{{ $datauser->level->level_name }}</td>
+                        <td>{{ $dataLevel->level_name }}</td>
                         <td>
-                        {{--<a href="{{ route('user.index', ['edit' => $datauser->id]) }}" class="btn btn-sm btn-warning">
+                        {{--<a href="{{ route('Level.index', ['edit' => $dataLevel->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <a href="{{ route('user.edit', $datauser->id) }}" class="btn btn-shadow btn-warning">Edit</a>
-                            <form onclick="return confirm('Yakin ingin menghapus {{ $datauser->name }} ?')" action="{{ route('user.destroy', $datauser->id) }}" method="post" class="d-inline">
+                            <a href="{{ route('level.edit', $dataLevel->id) }}" class="btn btn-shadow btn-warning">Edit</a>
+                            <form onclick="return confirm('Yakin ingin menghapus {{ $dataLevel->level_name }} ?')" action="{{ route('level.destroy', $dataLevel->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                 <button class="btn btn-shadow btn-danger">Hapus</button>
@@ -94,10 +82,10 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Tambah User</h5>
+        <h5 class="modal-title" id="exampleModalCenterTitle">Tambah Level</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="{{ route('user.store') }}" method="post" >
+      <form action="{{ route('Level.store') }}" method="post" >
           @csrf
       <div class="modal-body">
             <div class="mb-3">
@@ -114,7 +102,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Level User</label>
+                <label for="exampleInputEmail1" class="form-label">Level Level</label>
                 <select class="form-select" aria-label="Default select example" name="level">
                     <option selected disabled>--Pilih Level--</option>
                     @foreach ($levels as $keylevel)
@@ -137,7 +125,7 @@
 @endsection --}}
 
 {{-- @section('modal-edit')
-@if ($editUser)
+@if ($editLevel)
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       var modal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -146,31 +134,31 @@
   </script>
 @endif --}}
 
-{{-- @if ($editUser)
+{{-- @if ($editLevel)
     <div id="editModal" class="modal fade show" tabindex="-1" aria-modal="true" style="display: block;" role="dialog">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form method="POST" action="{{ route('user.update', $editUser->id) }}">
+      <form method="POST" action="{{ route('Level.update', $editLevel->id) }}">
         @csrf
         @method('PUT')
         <div class="modal-header">
-          <h5 class="modal-title">Edit User</h5>
-          <a href="{{ route('user.index') }}" class="btn-close"></a>
+          <h5 class="modal-title">Edit Level</h5>
+          <a href="{{ route('Level.index') }}" class="btn-close"></a>
         </div>
         <div class="modal-body">
-          <input type="text" name="name" class="form-control mb-2" value="{{ $editUser->name }}">
-          <input type="email" name="email" class="form-control mb-2" value="{{ $editUser->email }}">
+          <input type="text" name="name" class="form-control mb-2" value="{{ $editLevel->name }}">
+          <input type="email" name="email" class="form-control mb-2" value="{{ $editLevel->email }}">
           <input type="password" name="password" class="form-control mb-2" placeholder="Kosongkan jika tidak diubah">
           <select name="level" class="form-select mb-2">
             @foreach ($levels as $level)
-              <option value="{{ $level->id }}" {{ $editUser->id_level == $level->id ? 'selected' : '' }}>
+              <option value="{{ $level->id }}" {{ $editLevel->id_level == $level->id ? 'selected' : '' }}>
                 {{ $level->level_name }}
               </option>
             @endforeach
           </select>
         </div>
         <div class="modal-footer">
-          <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
+          <a href="{{ route('Level.index') }}" class="btn btn-secondary">Batal</a>
           <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
       </form>
