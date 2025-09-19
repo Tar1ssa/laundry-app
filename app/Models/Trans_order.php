@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
 class Trans_order extends Model
 {
     use SoftDeletes;
@@ -19,6 +20,11 @@ class Trans_order extends Model
         'order_change',
         'total'
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'id_customer', 'id');
+    }
 
     protected $date = ['deleted_at'];
 }

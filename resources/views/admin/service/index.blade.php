@@ -53,17 +53,17 @@
                       <tr>
                         <td>{{ $index +=1 }}</td>
                         <td>{{ $dataService->service_name}}</td>
-                        <td>{{ $dataService->price }}</td>
+                        <td>{{ "Rp.". number_format($dataService->price, 2, ',','.')  }}</td>
                         <td>{{ $dataService->description }}</td>
                         <td>
                         {{--<a href="{{ route('Service.index', ['edit' => $dataService->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <a href="{{ route('service.edit', $dataService->id) }}" class="btn btn-shadow btn-warning">Edit</a>
+                            <a href="{{ route('service.edit', $dataService->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div></a>
                             <form onclick="return confirm('Yakin ingin menghapus {{ $dataService->service_name }} ?')" action="{{ route('service.destroy', $dataService->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                <button class="btn btn-shadow btn-danger">Hapus</button>
+                                <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-trash fs-5 text-white"></i>Hapus</div></button>
 
                             </form>
                         </td>

@@ -12,9 +12,7 @@
             <div class="row align-items-center">
               <div class="col-md-12">
                 <ul class="breadcrumb">
-                  <li class="breadcrumb-item"><a href="#">Master Data</a></li>
-                  <li class="breadcrumb-item"><a href="#">User</a></li>
-                  <li class="breadcrumb-item" aria-current="page">Users</li>
+                  <li class="breadcrumb-item" aria-current="page"><a href="#">Transaksi</a></li>
                 </ul>
               </div>
               <div class="col-md-12">
@@ -32,9 +30,9 @@
           <div class="col-sm-12">
             <div class="card">
               <div class="card-header d-flex justify-content-between">
-                <h3>Data Users</h3>
-                <a href="{{ route('user.create') }}" class="btn btn-shadow btn-primary">Tambah User</a>
-                {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah User</button> --}}
+                <h3>Data Transaksi</h3>
+                <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
+                {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah Transaksi</button> --}}
               </div>
               <div class="card-body">
                 <div class="dt-responsive table-responsive">
@@ -42,36 +40,32 @@
                     <thead>
                       <tr>
                         <th>No.</th>
-                        <th>Nama depan</th>
-                        <th>Nama belakang</th>
-                        <th>E-mail</th>
-                        <th>Level</th>
+                        <th>No.Transaksi</th>
+                        <th>Nama customer</th>
+                        <th>Tanggal transaksi</th>
+                        <th>Tanggal transaksi selesai</th>
+                        <th>Status</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                        @foreach ($users as $index => $datauser)
-                        @php
-
-                            $parts = explode(' ', $datauser['name']);
-                            $first = array_shift($parts);
-                            $last = implode(' ', $parts);
-                        @endphp
+                        @foreach ($Transaksi as $index => $dataTransaksi)
                       <tr>
                         <td>{{ $index +=1 }}</td>
-                        <td>{{ $first}}</td>
-                        <td>{{ $last }}</td>
-                        <td>{{ $datauser['email'] }}</td>
-                        <td>{{ $datauser->level->level_name }}</td>
+                        <td>{{ $dataTransaksi->order_code}}</td>
+                        <td>{{ $dataTransaksi->customerName->customer_name }}</td>
+                        <td>{{ $dataTransaksi->order_date }}</td>
+                        <td>{{ $dataTransaksi->order_end_date ? $dataTransaksi->order_end_date : "belum selesai" }}</td>
+                        <td>{{ $dataTransaksi->order_status == 2 ? "order selesai" : 'order belum selesai'}}</td>
                         <td>
-                        {{--<a href="{{ route('user.index', ['edit' => $datauser->id]) }}" class="btn btn-sm btn-warning">
+                        {{--<a href="{{ route('Transaksi.index', ['edit' => $dataTransaksi->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <a href="{{ route('user.edit', $datauser->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div></a>
-                            <form onclick="return confirm('Yakin ingin menghapus {{ $datauser->name }} ?')" action="{{ route('user.destroy', $datauser->id) }}" method="post" class="d-inline">
+                            <a href="#" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i>Detail transaksi</div></a>
+                            <form onclick="return confirm('Yakin ingin membatalkan {{ $dataTransaksi->order_code }} ?')" action="{{ route('transaksi.destroy', $dataTransaksi->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-trash fs-5 text-white"></i>Hapus</div></button>
+                                <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-trash fs-5 text-white"></i>Batal</div></button>
 
                             </form>
                         </td>
@@ -94,10 +88,10 @@
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Tambah User</h5>
+        <h5 class="modal-title" id="exampleModalCenterTitle">Tambah Transaksi</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <form action="{{ route('user.store') }}" method="post" >
+      <form action="{{ route('Transaksi.store') }}" method="post" >
           @csrf
       <div class="modal-body">
             <div class="mb-3">
@@ -114,7 +108,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Level User</label>
+                <label for="exampleInputEmail1" class="form-label">Level Transaksi</label>
                 <select class="form-select" aria-label="Default select example" name="level">
                     <option selected disabled>--Pilih Level--</option>
                     @foreach ($levels as $keylevel)
@@ -137,7 +131,7 @@
 @endsection --}}
 
 {{-- @section('modal-edit')
-@if ($editUser)
+@if ($editTransaksi)
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       var modal = new bootstrap.Modal(document.getElementById('editModal'));
@@ -146,31 +140,31 @@
   </script>
 @endif --}}
 
-{{-- @if ($editUser)
+{{-- @if ($editTransaksi)
     <div id="editModal" class="modal fade show" tabindex="-1" aria-modal="true" style="display: block;" role="dialog">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      <form method="POST" action="{{ route('user.update', $editUser->id) }}">
+      <form method="POST" action="{{ route('Transaksi.update', $editTransaksi->id) }}">
         @csrf
         @method('PUT')
         <div class="modal-header">
-          <h5 class="modal-title">Edit User</h5>
-          <a href="{{ route('user.index') }}" class="btn-close"></a>
+          <h5 class="modal-title">Edit Transaksi</h5>
+          <a href="{{ route('Transaksi.index') }}" class="btn-close"></a>
         </div>
         <div class="modal-body">
-          <input type="text" name="name" class="form-control mb-2" value="{{ $editUser->name }}">
-          <input type="email" name="email" class="form-control mb-2" value="{{ $editUser->email }}">
+          <input type="text" name="name" class="form-control mb-2" value="{{ $editTransaksi->name }}">
+          <input type="email" name="email" class="form-control mb-2" value="{{ $editTransaksi->email }}">
           <input type="password" name="password" class="form-control mb-2" placeholder="Kosongkan jika tidak diubah">
           <select name="level" class="form-select mb-2">
             @foreach ($levels as $level)
-              <option value="{{ $level->id }}" {{ $editUser->id_level == $level->id ? 'selected' : '' }}>
+              <option value="{{ $level->id }}" {{ $editTransaksi->id_level == $level->id ? 'selected' : '' }}>
                 {{ $level->level_name }}
               </option>
             @endforeach
           </select>
         </div>
         <div class="modal-footer">
-          <a href="{{ route('user.index') }}" class="btn btn-secondary">Batal</a>
+          <a href="{{ route('Transaksi.index') }}" class="btn btn-secondary">Batal</a>
           <button type="submit" class="btn btn-primary">Simpan</button>
         </div>
       </form>

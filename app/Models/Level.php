@@ -13,5 +13,9 @@ class Level extends Model
         'level_name'
     ];
 
+    public function users()
+    {
+        return $this->hasMany(User::class, 'id_user');
+    }
     protected $date = ['deleted_at'];
 }

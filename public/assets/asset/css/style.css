@@ -49,6 +49,8 @@ h2,
     font-weight: 100;
 }
 
+
+
 :root,
 [data-bs-theme=light] {
     --bs-blue: #1890ff;
