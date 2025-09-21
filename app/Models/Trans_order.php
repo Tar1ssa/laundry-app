@@ -26,5 +26,10 @@ class Trans_order extends Model
         return $this->belongsTo(Customer::class, 'id_customer', 'id');
     }
 
+    public function detailOrder()
+    {
+        return $this->hasMany(Trans_order_detail::class, 'id_order', 'id');
+    }
+
     protected $date = ['deleted_at'];
 }

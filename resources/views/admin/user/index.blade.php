@@ -67,11 +67,11 @@
                         {{--<a href="{{ route('user.index', ['edit' => $datauser->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <a href="{{ route('user.edit', $datauser->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div></a>
+                            <a href="{{ route('user.edit', $datauser->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div></a>
                             <form onclick="return confirm('Yakin ingin menghapus {{ $datauser->name }} ?')" action="{{ route('user.destroy', $datauser->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-trash fs-5 text-white"></i>Hapus</div></button>
+                                <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-trash fs-5 text-white"></i>Hapus</div></button>
 
                             </form>
                         </td>

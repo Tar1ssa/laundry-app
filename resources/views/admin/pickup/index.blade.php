@@ -12,7 +12,8 @@
             <div class="row align-items-center">
               <div class="col-md-12">
                 <ul class="breadcrumb">
-                  <li class="breadcrumb-item" aria-current="page"><a href="#">Transaksi</a></li>
+                    <li class="breadcrumb-item"><a href="#">Transaksi</a></li>
+                  <li class="breadcrumb-item" aria-current="page"><a href="#">Pickup Transaksi</a></li>
                 </ul>
               </div>
               <div class="col-md-12">
@@ -30,9 +31,9 @@
           <div class="col-sm-12">
             <div class="card">
               <div class="card-header d-flex justify-content-between">
-                <h3>Data Transaksi</h3>
-                <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
-                {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah Transaksi</button> --}}
+                <h3>Data Pickup Transaksi</h3>
+
+
               </div>
               <div class="card-body">
                 <div class=" table-responsive">
@@ -42,38 +43,35 @@
                         <th>No.</th>
                         <th>No.Transaksi</th>
                         <th>Nama customer</th>
+                        <th>Nama Pengambil</th>
                         <th>Tanggal transaksi</th>
-                        <th>Tanggal transaksi selesai</th>
+                        <th>Tanggal pickup</th>
                         <th>Status</th>
                         <th>Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                        @foreach ($Transaksi as $index => $dataTransaksi)
+                        @foreach ($Pickup as $index => $dataPickup)
                       <tr>
                         <td>{{ $index +=1 }}</td>
-                        <td>{{ $dataTransaksi->order_code}}</td>
-                        <td>{{ $dataTransaksi->customer->customer_name }}</td>
-                        <td>{{ $dataTransaksi->order_date }}</td>
-                        <td>{{ $dataTransaksi->order_end_date ? $dataTransaksi->order_end_date : "belum selesai" }}</td>
+                        <td>{{ $dataPickup->order->order_code}}</td>
+                        <td>{{ $dataPickup->order->customer->customer_name ? $dataPickup->order->customer->customer_name : ''}}</td>
+                        <td>{{ $dataPickup->customerName ? $dataPickup->customerName->customer_name  : ''}}</td>
+                        <td>{{ $dataPickup->order->order_date }}</td>
+                        <td>{{ $dataPickup->pickup_date ? $dataPickup->pickup_date : 'belum diambil' }}</td>
                         <td>
                             <ul class="list-unstyled">
-                                <li><span class="badge {{ $dataTransaksi->order_status == 2 ? "bg-light-success" : "bg-light-secondary" }}">{{ $dataTransaksi->order_status == 2 ? "order selesai" : "order belum selesai" }}</span></li>
-                                <li><span class="badge {{ $dataTransaksi->order_end_date ? "bg-light-success" : "bg-light-secondary" }} ">{{ $dataTransaksi->order_end_date ? "lunas" : "belum lunas" }}</span></li>
+                                <li><span class="badge {{ $dataPickup->pickup_date ? "bg-light-success" : "bg-light-secondary" }}">{{ $dataPickup->pickup_date  ? "telah diambil" : "order belum diambil" }}</span></li>
+
                             </ul>
                             </td>
                         <td>
-                        {{--<a href="{{ route('Transaksi.index', ['edit' => $dataTransaksi->id]) }}" class="btn btn-sm btn-warning">
+                        {{--<a href="{{ route('Transaksi.index', ['edit' => $dataPickup->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <form onclick="return confirm('Yakin ingin menandai transaksi {{ $dataTransaksi->order_code }} selesai ?')" action="{{ route('transaksi.done', $dataTransaksi->id) }}" method="post" class="d-inline">
-                                    @csrf
-                                    @method('PUT')
-                                <button class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-check fs-5 text-white"></i>Tandai selesai</div></button>
 
-                            </form>
-                            <a href="{{route('transaksi.show',$dataTransaksi->id)}}" class="btn btn-shadow {{ $dataTransaksi->order_end_date ? "btn-success" : 'btn-outline-success' }} "><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti {{ $dataTransaksi->order_end_date ? "ti-history text-white" : 'ti-cash text-green' }}  fs-5  "></i>{{ $dataTransaksi->order_end_date ? "Detail transaksi" : 'Bayar transaksi' }}</div></a>
-                            <form onclick="return confirm('Yakin ingin membatalkan {{ $dataTransaksi->order_code }} ?')" action="{{ route('transaksi.destroy', $dataTransaksi->id) }}" method="post" class="d-inline">
+                            <a href="{{route('pickup.edit',$dataPickup->id)}}" class="btn btn-shadow {{ $dataPickup->pickup_date ? "btn-success" : 'btn-outline-success' }} "><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti {{ $dataPickup->pickup_date ? " ti-truck-delivery text-white" : ' ti-truck-delivery text-green' }}  fs-5  "></i>{{ $dataPickup->pickup_date ? "Detail pickup" : 'Pickup' }}</div></a>
+                            <form onclick="return confirm('Yakin ingin membatalkan {{ $dataPickup->order_code }} ?')" action="{{ route('pickup.destroy', $dataPickup->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                 <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-trash fs-5 text-white"></i>Batal</div></button>

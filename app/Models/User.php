@@ -30,6 +30,10 @@ class User extends Authenticatable
         return $this->belongsTo(Level::class, 'id_level', 'id');
     }
 
+    // public function isAdmin() {
+    //     return $this->
+    // }
+
     /**
      * The attributes that should be hidden for serialization.
      *

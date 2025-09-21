@@ -13,7 +13,7 @@ class Trans_laundry_pickup extends Model
         'notes'
     ];
 
-    public function customer()
+    public function customerName()
     {
         return $this->belongsTo(Customer::class, 'id_customer', 'id');
     }

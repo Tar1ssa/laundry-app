@@ -47,7 +47,7 @@
                                     <select
                                         class="form-control"
                                         data-trigger
-                                        name="choices-single-default"
+                                        name="id_customer"
                                         id="choices-single-default"
                                     >
                                         <option value="" selected disabled>--Pilih customer--</option>
@@ -64,8 +64,8 @@
                         <div class="col-md-6 ">
                             <div class="mb-3 form-group">
                                 <label for="" class="col-form-label text-lg-end">Tanggal order</label>
-                                <input value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" type="date" class="form-control" id="floatinEmail" placeholder="" name="order_date" readonly>
-
+                                {{-- <input value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" type="date" class="form-control" id="floatinEmail" placeholder="" name="order_date" readonly> --}}
+                                <input value="" type="date" class="form-control" id="floatinEmail" placeholder="" name="order_date">
                             </div>
                         </div>
                     </div>
@@ -82,12 +82,43 @@
                                         <th>Qty</th>
                                         <th>Harga service (per kg)</th>
                                         <th>Subtotal</th>
+                                        <th>Catatan</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody id='tableBody'></tbody>
                             </table>
                             </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6"></div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="" class="form-label">Total</label>
+                                <div class="d-flex flex-row">
+                                <div class="input-group-text">Rp.</div>
+
+                                <input type="number" name="total" id="total" class="form-control" readonly>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="" class="form-label">Bayar</label>
+                                <div class="d-flex flex-row">
+                                <div class="input-group-text">Rp.</div>
+
+                                <input type="number" name="order_pay" id="order_pay" class="form-control" >
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="" class="form-label">Kembalian</label>
+                                <div class="d-flex flex-row">
+                                <div class="input-group-text">Rp.</div>
+
+                                <input type="number" name="order_change" id="order_change" class="form-control" readonly>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <button type="submit" class="btn btn-shadow btn-primary">Submit</button>
                     <a href="{{ route('transaksi.index') }}" class="btn btn-shadow btn-secondary">Kembali</a>
                   </div>
@@ -141,7 +172,7 @@
                                     <select
                                         class="form-select form-select-sm"
                                         data-service
-                                        name="choices-single-default"
+                                        name="id_service[]"
                                         id="choices-single-default"
                                     >
                                         <option value="" selected disabled>--Pilih service--</option>
@@ -156,26 +187,27 @@
                 </div>
             </td>
             <td>
-                                    <div class="d-flex flex-row">
-                                        <input type="number" name="qty[]" class="form-control form-control-sm qty" id="" placeholder="Masukkan jumlah">
-                                        <div class="input-group-text">kg</div>
-                                    </div>
+                <div class="d-flex flex-row">
+                    <input type="number" name="qty[]" class="form-control form-control-sm qty" id="" placeholder="Masukkan jumlah">
+                    <div class="input-group-text">kg</div>
+                </div>
             </td>
             <td>
             <div class="d-flex flex-row">
-                                        <div class="input-group-text">Rp.</div>
-                                        <input value="" type="hidden" id='hiddenprice' name="price_service[]" class="form-control price" id="inlineFormInputGroupUsername" placeholder="" readonly>
-                                        <input value="" type="number" name="price_per_kg[]" class="form-control form-control-sm" id="inlineFormInputGroupUsername" placeholder="" readonly>
-                                        <div class="input-group-text">per kg</div>
-                                    </div>
+                <div class="input-group-text">Rp.</div>
+                    <input value="" type="hidden" id='hiddenprice' name="price_service[]" class="form-control price" id="inlineFormInputGroupUsername" placeholder="" readonly>
+                    <input value="" type="number" name="price_per_kg[]" class="form-control form-control-sm" id="inlineFormInputGroupUsername" placeholder="" readonly>
+                    <div class="input-group-text">per kg</div>
+                </div>
             </td>
             <td>
                 <div class="d-flex flex-row">
                 <div class="input-group-text">Rp.</div>
-                <input value="" type="number" name="subtotal[]" class="form-control form-control-sm subtotal" readonly>
+                <input value="" type="number" name="" class="form-control form-control-sm subtotal" readonly>
                 <input value="" id='subtotale' type="hidden" name="subtotali[]" class="form-control subtotal" readonly>
                 </div
             </td>
+            <td><textarea class="form-control" id="" rows="1" name="note[]"></textarea></td>
             <td><button class='btn btn-danger delete-row' type='submit' >Hapus</button></td>
         </tr>`;
 
@@ -236,25 +268,84 @@
 
 </script>
 <script>
-   document.querySelector('#tableTrans tbody').addEventListener('input', function(e) {
-    if (e.target.classList.contains('qty') || e.target.classList.contains('price')) {
-        const row = e.target.closest('tr');
-        const qtyInput = row.querySelector('.qty');
-        const priceInput = row.querySelector('.price');
-        const subtotalInput = row.querySelector('.subtotal');
-        const hiddenSubtotal = row.querySelector('#subtotale');
 
-        const qty = parseFloat(qtyInput.value) || 0;
-        const rawPrice = priceInput.value.replace(/[^\d.]/g, ''); // remove commas and non-numeric characters
-        const price = parseFloat(rawPrice) || 0;
 
-        const subtotal = qty * price;
-        const formattedNumber = new Intl.NumberFormat('id-ID').format(subtotal);
-        subtotalInput.value = formattedNumber;
-        hiddenSubtotal.value = subtotal.toFixed(0) // no decimals
-    }
+
+// element references
+const tbody = document.querySelector('#tableTrans tbody');
+const totalEl = document.getElementById('total');
+const bayarEl = document.getElementById('order_pay');
+const kembalianEl = document.getElementById('order_change');
+
+// hitung total dari semua hidden subtotals
+function recalcTotal() {
+  let total = 0;
+  document.querySelectorAll("input[name='subtotali[]']").forEach(inp => {
+    total += parseFloat(inp.value) || 0;
+  });
+
+  totalEl.value = total.toFixed(0); // atau tanpa .toFixed jika mau number asli
+  recalcKembalian();
+}
+
+// hitung kembalian (bayar - total)
+function recalcKembalian() {
+  const total = parseFloat(totalEl.value) || 0;
+  const bayar = parseFloat(bayarEl.value) || 0;
+  let kembalian = bayar - total;
+
+  // jika ingin kembalian tidak negatif, uncomment baris berikut:
+  if (kembalian < 0) kembalian = 0;
+  kembalianEl.value = kembalian.toFixed(0);
+}
+
+// event delegation: update subtotal baris saat qty/price berubah
+tbody.addEventListener('input', function(e) {
+  if (e.target.classList.contains('qty') || e.target.classList.contains('price')) {
+    const row = e.target.closest('tr');
+
+    const qty = parseFloat((row.querySelector('.qty').value || '0').toString()) || 0;
+
+    // ambil price sebagai string → bersihkan non-digit → parseFloat
+    const priceInput = row.querySelector('.price');
+    const rawPrice = (priceInput && (priceInput.value || '')).toString().replace(/[^\d.]/g, '');
+    const price = parseFloat(rawPrice) || 0;
+
+    const subtotal = qty * price;
+    const subtotalformattedNumber = new Intl.NumberFormat('id-ID').format(subtotal);
+
+    // update visible subtotal (input type=number) — pastikan selector memilih input yang bukan hidden
+    const visibleSubtotal = row.querySelector('input[type="number"].subtotal:not([name="subtotali[]"])');
+    if (visibleSubtotal) visibleSubtotal.value = subtotalformattedNumber;
+
+    // update hidden raw subtotal (name="subtotali[]")
+    const hiddenSubtotal = row.querySelector("input[name='subtotali[]']");
+    if (hiddenSubtotal) hiddenSubtotal.value = subtotal.toFixed(0);
+
+    // recalc grand total
+    recalcTotal();
+  }
 });
 
+// handling row delete (pastikan tombol delete bertipe="button")
+tbody.addEventListener('click', function(e) {
+  if (e.target.classList.contains('delete-row')) {
+    e.preventDefault();
+    const row = e.target.closest('tr');
+    if (row) {
+      row.remove();
+      recalcTotal();
+    }
+  }
+});
+
+// recalc kembalian saat user input bayar
+if (bayarEl) {
+  bayarEl.addEventListener('input', recalcKembalian);
+}
+
+// inisialisasi awal (jika ada baris prefilled)
+recalcTotal();
 
 </script>
 
