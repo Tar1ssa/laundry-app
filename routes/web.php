@@ -14,28 +14,33 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('login',[LoginController::class,'login'])->name('login');
-Route::post('actionLogin', [LoginController::class,'actionLogin'])->name('actionLogin');
+Route::get('login', [LoginController::class, 'login'])->name('login');
+Route::post('actionLogin', [LoginController::class, 'actionLogin'])->name('actionLogin');
 
 Route::middleware('auth')->group(function () {
 
-Route::post('logout',[LoginController::class,'logout'])->name('logout');
+    Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::resource('dashboard', DashboardController::class);
+    Route::resource('dashboard', DashboardController::class);
 
-// Master Data
-Route::resource('user', UserController::class);
-Route::resource('level', LevelController::class);
-Route::resource('service', ServiceController::class);
-Route::resource('customer', CustomerController::class);
-// End Master Data
+    // Administrator
+    Route::middleware('role:Administrator')->group(function () {
+        // Master Data
+        Route::resource('user', UserController::class);
+        Route::resource('level', LevelController::class);
+        Route::resource('service', ServiceController::class);
+        Route::resource('customer', CustomerController::class);
+        // End Master Data
+    });
 
-// Transaction
-Route::resource('transaksi', TransController::class);
-Route::put('transaksi.done/{id}', [TransController::class, 'done'])->name('transaksi.done');
-// End Transaction
+    Route::middleware('role:Operator')->group(function () {
+        // Transaction
+        Route::resource('transaksi', TransController::class);
+        Route::put('transaksi.done/{id}', [TransController::class, 'done'])->name('transaksi.done');
+        // End Transaction
 
-// Pickup
-Route::resource('pickup', PickupController::class);
-Route::post('ready', [PickupController::class, 'ready'])->name('pickup.ready');
+        // Pickup
+        Route::resource('pickup', PickupController::class);
+        Route::post('ready', [PickupController::class, 'ready'])->name('pickup.ready');
+    });
 });
