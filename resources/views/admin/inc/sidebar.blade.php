@@ -21,6 +21,9 @@
           <label>Side Panel</label>
           <i class="ti ti-brand-chrome"></i>
         </li>
+
+        @if (auth()->check() && auth()->user()->isAdmin())
+
         <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-stack-2"></i></span><span class="pc-mtext">Master Data</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
           <ul class="pc-submenu">
@@ -35,16 +38,19 @@
             </li>
           </ul>
         </li>
+        @endif
+
+        @if (auth()->check() && auth()->user()->isOperator())
 
         <li class="pc-item pc-hasmenu">
           <a href="#!" class="pc-link"><span class="pc-micon"><i class="ti ti-receipt"></i></span><span class="pc-mtext">Transaksi</span><span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
-          <ul class="pc-submenu">
+            <ul class="pc-submenu">
             <li class="pc-item"><a class="pc-link" href="{{ route('transaksi.index') }}">Transaksi</a></li>
             <li class="pc-item"><a class="pc-link" href="{{ route('pickup.index') }}">Pickup</a></li>
-        </a>
+
+            </ul>
         </li>
-          </ul>
-        </li>
+        @endif
       </ul>
 
     </div>
