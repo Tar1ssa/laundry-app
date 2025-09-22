@@ -31,7 +31,12 @@
             <div class="card">
               <div class="card-header d-flex justify-content-between">
                 <h3>Data Transaksi</h3>
-                <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
+                {{-- laundry trans button --}}
+                <a href="{{ route('laundry.transc') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
+                {{-- end laundry trans button --}}
+                {{-- <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a> --}}
+
+
                 {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah Transaksi</button> --}}
               </div>
               <div class="card-body">

@@ -4,6 +4,7 @@ use App\Http\Controllers\CustomerController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\LevelController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PickupController;
@@ -37,10 +38,17 @@ Route::middleware('auth')->group(function () {
         // Transaction
         Route::resource('transaksi', TransController::class);
         Route::put('transaksi.done/{id}', [TransController::class, 'done'])->name('transaksi.done');
+        Route::get('laundry.transc', [TransController::class, 'laundryTrans'])->name('laundry.transc');
+        Route::get('get-customer/{id}', [TransController::class, 'getCustomerDataById']);
+        Route::get('get-layanan', [TransController::class, 'getLayanan']);
+        Route::get('get-transcode', [TransController::class, 'getTranscode']);
+        Route::post('/transaksi/store', [TransController::class, 'LaundryStore'])->name('LaundryStore');
         // End Transaction
 
         // Pickup
         Route::resource('pickup', PickupController::class);
         Route::post('ready', [PickupController::class, 'ready'])->name('pickup.ready');
     });
+
+    Route::resource('laporan', LaporanController::class);
 });

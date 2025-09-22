@@ -23,6 +23,7 @@
       <!-- [ breadcrumb ] end -->
       <!-- [ Main Content ] start -->
       <div class="row">
+
         @if (auth()->check())
             <div class="col-md-12">
                 <div class="card">
@@ -33,17 +34,19 @@
                     </div>
                   </div>
             </div>
-
+        @endif
         <!-- [ sample-page ] start -->
         <div class="col-md-6 col-xl-3">
           <div class="card">
-            <div class="card-body text-center">
-              <h6 class="mb-2 f-w-400 text-muted">level</h6>
-              <h4 class="mb-3">{{ auth()->user()->level->level_name }}</h4>
+            <div class="card-body">
+              <h6 class="mb-2 f-w-400 text-muted">Total Page Views</h6>
+              <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"><i
+                    class="ti ti-trending-up"></i> 59.3%</span></h4>
+              <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">35,000</span> this year
+              </p>
             </div>
           </div>
         </div>
-        @endif
         <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">

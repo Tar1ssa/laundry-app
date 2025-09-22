@@ -12,6 +12,7 @@ use App\Models\Type_of_service;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
+use Pest\ArchPresets\Custom;
 
 class TransController extends Controller
 {
@@ -58,7 +59,7 @@ class TransController extends Controller
      */
     public function store(Request $request)
     {
-         DB::beginTransaction();
+        DB::beginTransaction();
 
         try {
 
@@ -104,7 +105,6 @@ class TransController extends Controller
             if ($request->order_pay > $request->total) {
                 $order_end_date = \Carbon\Carbon::now();
                 $create['order_end_date'] =  $order_end_date;
-
             }
 
             $insertOrder = Trans_order::create($create);
@@ -113,9 +113,9 @@ class TransController extends Controller
                 Trans_order_detail::create([
                     'id_order' => $insertOrder->id,
                     'id_service' => $request->id_service[$key],
-                    'qty'=> $request->qty[$key],
+                    'qty' => $request->qty[$key],
                     'subtotal' => $request->subtotali[$key],
-                    'notes'  =>$request->note[$key]
+                    'notes'  => $request->note[$key]
                 ]);
             }
 
@@ -211,7 +211,7 @@ class TransController extends Controller
         if ($done->order_status == 2 && $done->order_end_date) {
             Trans_laundry_pickup::create([
                 'id_order' => $done->id
-                ]);
+            ]);
         }
         Alert::success('Sukses!', 'Transaksi ditandakan selesai!');
         return redirect()->back()->with('Sukses!', 'Transaksi ditandakan selesai!');
@@ -227,5 +227,98 @@ class TransController extends Controller
         $Trans->delete();
         Alert::success('Sukses!', 'Transaksi berhasil dibatalkan!');
         return redirect()->to('transaksi');
+    }
+
+    public function laundryTrans()
+    {
+        $laundryCustomer = Customer::get();
+        $laundryLayanan = Type_of_service::get();
+        return view('admin.transaksi.laundry-trans', compact('laundryLayanan', 'laundryCustomer'));
+    }
+
+    public function getCustomerDataById($id_customer)
+    {
+        try {
+            $customerData = Customer::where('id', $id_customer)->get();
+            return response()->json(['status' => 'success', 'message' => 'fetch berhasil', 'data' => $customerData]);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => 'error', 'message' => $th->getMessage()], 500);
+        }
+    }
+
+    public function getLayanan()
+    {
+        $layanan = Type_of_service::all();
+        $prices = $layanan->pluck('price', 'service_name');
+        return response()->json($prices);
+    }
+
+    public function getTranscode()
+    {
+
+
+        $code = 'TRNSC'; // Set a fixed transaction code prefix
+        $today = Carbon::now()->format('Ymd'); // Get today's date in 'YYYYMMDD' format using Carbon
+        $prefix = $code . '-' . $today; // Combine the code and date to form a transaction prefix like 'TRNSC-20250903'
+        $todayfix = Carbon::now()->toDateString();
+        $lasttransaction = Trans_order::whereDate('created_at', $todayfix) // Filter Borrows records created today
+            ->orderBy('id', 'desc') // Sort by ID in descending order to get the latest entry
+            ->first(); // Retrieve the first (latest) record from the filtered results
+        if ($lasttransaction) { // Check if a transaction was found for today
+            $lastNumber = (int) substr($lasttransaction->order_code, -3); // Extract the last 3 digits of the transaction number and convert to integer
+            $newNumber = str_pad($lastNumber + 1, 3, "0", STR_PAD_LEFT); // Increment the number by 1 and pad it to 3 digits with leading zeros
+        } else {
+            $newNumber = '001'; // If no transaction exists for today, set the new number to 'Nol' (likely placeholder or default)
+        }
+        $trans_number = $prefix . $newNumber;
+        return response()->json($trans_number);
+    }
+
+    public function LaundryStore(Request $request)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Simpan order utama
+            $order = Trans_order::create([
+                'id_customer' => $request->id_customer,
+                'order_code' => $request->trans_code,
+                'order_date' => now(),
+                'order_end_date' => null,
+
+                'order_pay' => 0,
+                'order_change' => 0,
+                'total' => $request->total
+            ]);
+
+            // Simpan detail order
+            foreach ($request->items as $item) {
+                Trans_order_detail::create([
+                    'id_order' => $item->id,
+                    'id_service' => $item['id'],     // pastikan item punya ID service
+                    'qty' => $item['qty'],
+                    'subtotal' => $item['subtotal'],
+                    'notes' => $item['notes'] ?? null
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Transaksi berhasil disimpan',
+                'data' => $order
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+
+
+            return $request;
+            // return response()->json([
+            //     'success' => false,
+            //     'message' => 'Terjadi kesalahan saat menyimpan',
+            //     'error' => $e->getMessage()
+            // ], 500);
+        }
     }
 }
