@@ -915,8 +915,8 @@
         function updateStats() {
             const totalTransactions = transactions.length;
             const totalRevenue = transactions.reduce((sum, t) => sum + t.total, 0);
-            const activeOrders = transactions.filter(t => t.status !== 'delivered').length;
-            const completedOrders = transactions.filter(t => t.status === 'delivered').length;
+            const activeOrders = transactions.filter(t => t.order_status !== 1).length;
+            const completedOrders = transactions.filter(t => t.order_status == 1).length;
 
             document.getElementById('totalTransactions').textContent = totalTransactions;
             document.getElementById('totalRevenue').textContent = `Rp ${totalRevenue.toLocaleString()}`;
@@ -1303,7 +1303,7 @@
 
                 transactions = result;
                 transactionCounter = transactions.length + 1
-                console.log(transactions)
+                console.log('data transaksi riwayat',transactions)
             } catch (error) {
                 console.error("Gagal Memuat Data Transaksi: ", error)
             }

@@ -54,7 +54,7 @@
                       </tr>
                     </thead>
                     <tbody>
-                        @php
+                        {{-- @php
                             $statusList = [
                                 1 => 'Menunggu',
                                 2 => 'Diproses',
@@ -63,7 +63,7 @@
                             ];
 
                             $statusText = $statusList[$order->status] ?? 'Status Tidak Diketahui';
-                        @endphp
+                        @endphp --}}
                         @foreach ($Transaksi as $index => $dataTransaksi)
                       <tr>
                         <td>{{ $index +=1 }}</td>
