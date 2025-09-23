@@ -42,7 +42,12 @@ Route::middleware('auth')->group(function () {
         Route::get('get-customer/{id}', [TransController::class, 'getCustomerDataById']);
         Route::get('get-layanan', [TransController::class, 'getLayanan']);
         Route::get('get-transcode', [TransController::class, 'getTranscode']);
-        Route::post('/transaksi/store', [TransController::class, 'LaundryStore'])->name('LaundryStore');
+        Route::post('/transaksi/store', [TransController::class, 'LaundryStore'])->name('laundry.store');
+        Route::get('get-transaksi', [TransController::class, 'getTransaksi'])->name('getTransaksi');
+        Route::put('/transaksi/{id}/status', [TransController::class, 'setStatus'])->name('setTransaksiStatus');
+        Route::get('get-list-layanan', [TransController::class, 'listLayanan']);
+
+
         // End Transaction
 
         // Pickup

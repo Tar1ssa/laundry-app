@@ -428,8 +428,7 @@
                 <h2>🛒 Transaksi Baru</h2>
 
                 <form id="transactionForm">
-                    <label for="">Trans number</label>
-                    <input type="text" name="trans_code" id="trans_code" readonly>
+
                     <div class="form-group">
                         <label for="customerName">Nama Pelanggan</label>
                         <select name="customer" id="customerName" required>
@@ -528,6 +527,16 @@
             <div class="card">
                 <h2>📊 Riwayat Transaksi</h2>
                 <div class="transaction-list" id="transactionHistory">
+
+                    {{-- <div class="transaction-item">
+                        <h4>TRX-002 - Jane Smith</h4>
+                        <p>📞 0813-7654-3210</p>
+                        <p>🛍️ Cuci Kering - 3kg</p>
+                        <p>💰 Rp 15.000</p>
+                        <p>📅 13 Juli 2025, 13:15</p>
+                        <span class="status-badge status-ready">Siap</span>
+                    </div> --}}
+
                     {{-- <div class="transaction-item">
                         <h4>TRX-001 - John Doe</h4>
                         <p>📞 0812-3456-7890</p>
@@ -605,6 +614,32 @@
 
 
     <script>
+        function formatPhoneNumberDynamic(number) {
+            return number.match(/.{1,3}/g).join("-");
+        }
+
+        function formatDateYMD(date = new Date()) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+
+            return `${year}${month}${day}`;
+        }
+
+        function formatNumber(input) {
+            // Replace comma with dot for decimal separator
+            let value = input.value.replace(',', '.');
+
+            // Ensure only valid decimal number
+            if (!/^\d*\.?\d*$/.test(value)) {
+                value = value.slice(0, -1);
+            }
+
+            // Update input value
+            input.value = value;
+        }
+
+
         let LayananPrice = {};
         async function testFetch() {
                 // console.log('Script dimulai...');
@@ -630,45 +665,45 @@
             document.getElementById('serviceWeight').focus();
         }
 
-        function addToCart() {
-            const serviceType = document.getElementById('serviceType').value;
-            const weight = parseFloat(document.getElementById('serviceWeight').value);
-            const notes = document.getElementById('notes').value;
+        // function addToCart() {
+        //     const serviceType = document.getElementById('serviceType').value;
+        //     const weight = parseFloat(document.getElementById('serviceWeight').value);
+        //     const notes = document.getElementById('notes').value;
 
-            if (!serviceType || !weight || weight <= 0) {
-                alert('Mohon lengkapi semua field yang diperlukan!');
-                return;
-            }
+        //     if (!serviceType || !weight || weight <= 0) {
+        //         alert('Mohon lengkapi semua field yang diperlukan!');
+        //         return;
+        //     }
 
 
-             console.log('error fetch buku', error);
+        //      console.log('error fetch buku', error);
 
-            const prices = LayananPrice;
+        //     const prices = LayananPrice;
 
-            const price = prices[serviceType];
-            console.log('price');
+        //     const price = prices[serviceType];
+        //     console.log('price');
 
-            const subtotal = price * weight;
-            console.log('subtotal');
-            const item = {
-                id: Date.now(),
-                service: serviceType,
-                weight: weight,
-                price: price,
-                subtotal: subtotal,
-                notes: notes
-            };
+        //     const subtotal = price * weight;
+        //     console.log('subtotal');
+        //     const item = {
+        //         id: Date.now(),
+        //         service: serviceType,
+        //         weight: weight,
+        //         price: price,
+        //         subtotal: subtotal,
+        //         notes: notes
+        //     };
 
-            console.log('item');
+        //     console.log('item');
 
-            cart.push(item);
-            updateCartDisplay();
+        //     cart.push(item);
+        //     updateCartDisplay();
 
-            // Clear form
-            document.getElementById('serviceType').value = '';
-            document.getElementById('serviceWeight').value = '';
-            document.getElementById('notes').value = '';
-        }
+        //     // Clear form
+        //     document.getElementById('serviceType').value = '';
+        //     document.getElementById('serviceWeight').value = '';
+        //     document.getElementById('notes').value = '';
+        // }
 
         function updateCartDisplay() {
             const cartItems = document.getElementById('cartItems');
@@ -689,7 +724,7 @@
                 html += `
                     <tr>
                         <td>${item.service}</td>
-                        <td>${item.weight} ${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'}</td>
+                        <td>${item.weight} ${item.service} kg</td>
                         <td>Rp ${item.price.toLocaleString()}</td>
                         <td>Rp ${item.subtotal.toLocaleString()}</td>
                         <td>
@@ -739,6 +774,8 @@
 
         async function processTransaction() {
             const customerName = document.getElementById('customerName').value;
+            const customerSelect = document.getElementById('customerName');
+            const customerSelected = customerSelect.options[customerSelect.selectedIndex].getAttribute('data-nama');
             const customerPhone = document.getElementById('customerPhone').value;
             const customerAddress = document.getElementById('customerAddress').value;
 
@@ -750,55 +787,42 @@
             const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
 
             const transaction = {
-                order_code: TransCode
-                , customer: {
-                    id: customerName
-                    , phone: customerPhone
-                    , address: customerAddress
-                }
-                , items: [...cart]
-                , total: total
-                , order_date: new Date().toISOString()
-                , order_status: 0
+                id: TransCode, // harus sama dengan yang divalidasi Laravel
+                customer: {
+                    id: customerName,
+                    customer_name: customerSelected,
+                    phone: customerPhone,
+                    address: customerAddress
+                },
+                items: [...cart],
+                total: total,
+                order_date: new Date().toISOString(),
+                order_status: 1
             };
+            console.log('transaksi terkirim',transaction);
 
             try {
-                const res = await fetch("{{ route('LaundryStore') }}", {
-                    method: "POST"
-                    , headers: {
-                        "Content-Type": "application/json"
-                        , "Accept": "application/json"
-                        , "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
-                    }
-                    , body: JSON.stringify(transaction)
+                const res = await fetch("{{ route('laundry.store') }}", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute("content")
+                    },
+                    body: JSON.stringify(transaction)
                 });
 
-                if (!res.ok) {
-                    throw new Error(`HTTP error! Status: ${res.status}`);
-                }
+                console.log(res);
 
-                const result = await res.json();
-                alert("Transaksi berhasil disimpan!");
+                if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
+                const data = await res.json();
+                console.log(data.message);
+                showReceipt(transaction);
+                updateTransactionHistory();
+                updateStats();
 
-                // Reset cart
-                // cart = [];
-                // updateCartDisplay();
-
-                // // // 🔄 Ambil ulang data transaksi dari DB
-                // // await loadTransactions();
-
-                // transactionCounter++;
-
-                // // Show receipt
-                // showReceipt(result.data);
-
-                // // Clear form and cart
-                // clearCart();
-                // await updateTransactionHistory();
-                // await updateStats();
             } catch (error) {
-                console.error("Error saat menyimpan transaksi:" + error);
-                alert("Terjadi kesalahan saat menyimpan transaksi.");
+                console.error("Terjadi kesalahan:", error);
             }
         }
 
@@ -808,12 +832,12 @@
                     <div class="receipt-header">
                         <h2>🧺 LAUNDRY RECEIPT</h2>
                         <p>ID: ${transaction.id}</p>
-                        <p>Tanggal: ${new Date(transaction.date).toLocaleString('id-ID')}</p>
+                        <p>Tanggal: ${new Date(transaction.order_date).toLocaleString('id-ID')}</p>
                     </div>
 
                     <div style="margin-bottom: 20px;">
                         <strong>Pelanggan:</strong><br>
-                        ${transaction.customer.name}<br>
+                        ${transaction.customer.customer_name}<br>
                         ${transaction.customer.phone}<br>
                         ${transaction.customer.address}
                     </div>
@@ -822,7 +846,7 @@
                         <strong>Detail Pesanan:</strong><br>
                         ${transaction.items.map(item => `
                             <div class="receipt-item">
-                                <span>${item.service} (${item.weight} ${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'})</span>
+                                <span>${item.service} (${item.weight} ${item.service}) kg</span>
                                 <span>Rp ${item.subtotal.toLocaleString()}</span>
                             </div>
                         `).join('')}
@@ -853,25 +877,25 @@
 
         function printReceipt() {
             const originalContent = document.body.innerHTML;
-    const receiptContent = document.getElementById('modalContent').innerHTML;
-    document.body.innerHTML = receiptContent;
-    window.print();
-    document.body.innerHTML = originalContent;
-    location.reload();
+                const receiptContent = document.getElementById('modalContent').innerHTML;
+                document.body.innerHTML = receiptContent;
+                window.print();
+                document.body.innerHTML = originalContent;
+                location.reload();
         }
 
         function updateTransactionHistory() {
-            const historyContainer = document.getElementById('transactionHistory');
+         const historyContainer = document.getElementById('transactionHistory');
             const recentTransactions = transactions.slice(-5).reverse();
 
             const html = recentTransactions.map(transaction => `
                 <div class="transaction-item">
                     <h4>${transaction.id} - ${transaction.customer.name}</h4>
-                    <p>📞 ${transaction.customer.phone}</p>
-                    <p>🛍️ ${transaction.items.map(item => `${item.service} - ${item.weight}${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'}`).join(', ')}</p>
-                    <p>💰 Rp ${transaction.total.toLocaleString()}</p>
-                    <p>📅 ${new Date(transaction.date).toLocaleString('id-ID')}</p>
-                    <span class="status-badge status-${transaction.status}">${getStatusText(transaction.status)}</span>
+                    <p>📞 ${formatPhoneNumberDynamic(transaction.customer.phone)}</p>
+                    <p>🛍️ ${transaction.items.map(item => `${item.service} - ${item.weight}${item.service} kg`).join(', ')}</p>
+                    <p>💰 Rp. ${parseFloat(transaction.total ?? 0).toLocaleString('id-ID')}</p>
+                    <p>📅 ${new Date(transaction.date).toLocaleString('id-ID', { dateStyle: 'short' })}</p>
+                    <span class="status-badge status-${transaction.order_status}">${getStatusText(transaction.order_status)}</span>
                 </div>
             `).join('');
 
@@ -880,10 +904,10 @@
 
         function getStatusText(status) {
             const statusMap = {
-                'pending': 'Menunggu',
-                'process': 'Proses',
-                'ready': 'Siap',
-                'delivered': 'Selesai'
+                1: 'Menunggu',
+                2: 'Proses',
+                3: 'Siap',
+                4: 'Selesai'
             };
             return statusMap[status] || status;
         }
@@ -908,11 +932,11 @@
                         <div class="transaction-item">
                             <h4>${transaction.id} - ${transaction.customer.name}</h4>
                             <p>📞 ${transaction.customer.phone}</p>
-                            <p>🛍️ ${transaction.items.map(item => `${item.service} - ${item.weight}${item.service.includes('Sepatu') ? 'pasang' : item.service.includes('Karpet') ? 'm²' : 'kg'}`).join(', ')}</p>
+                            <p>🛍️ ${transaction.items.map(item => `${item.service} - ${item.weight}${item.service} kg`).join(', ')}</p>
                             <p>💰 Rp ${transaction.total.toLocaleString()}</p>
                             <p>📅 ${new Date(transaction.date).toLocaleString('id-ID')}</p>
-                            <span class="status-badge status-${transaction.status}">${getStatusText(transaction.status)}</span>
-                            <button class="btn btn-primary" onclick="updateTransactionStatus('${transaction.id}')" style="margin-top: 10px; padding: 5px 15px; font-size: 12px;">
+                            <span class="status-badge status-${transaction.order_status}">${getStatusText(transaction.order_status)}</span>
+                            <button class="btn btn-primary" onclick="updateTransactionStatus(${transaction.id_order})" style="margin-top: 10px; padding: 5px 15px; font-size: 12px;">
                                 📝 Update Status
                             </button>
                         </div>
@@ -990,92 +1014,93 @@
             document.getElementById('transactionModal').style.display = 'block';
         }
 
-        function manageServices() {
-            const servicesHtml = `
-                <h2>⚙️ Kelola Layanan</h2>
-                <p>Fitur ini memungkinkan Anda mengelola jenis layanan dan harga.</p>
+        async function getListLayanan() {
+            try {
+                    const resListLayanan = await fetch(`get-list-layanan`);
+                    const dataListLayanan = await resListLayanan.json();
+                } catch (err) {
+                    console.error('Fetch error:', err);
+                }
+        }
 
-                <table class="cart-table">
-                    <thead>
-                        <tr>
-                            <th>Layanan</th>
-                            <th>Harga</th>
-                            <th>Satuan</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Cuci Kering</td>
-                            <td>Rp 5.000</td>
-                            <td>per kg</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cuci Setrika</td>
-                            <td>Rp 7.000</td>
-                            <td>per kg</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                        <tr>
-                            <td>Setrika Saja</td>
-                            <td>Rp 3.000</td>
-                            <td>per kg</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                        <tr>
-                            <td>Dry Clean</td>
-                            <td>Rp 15.000</td>
-                            <td>per kg</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cuci Sepatu</td>
-                            <td>Rp 25.000</td>
-                            <td>per pasang</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                        <tr>
-                            <td>Cuci Karpet</td>
-                            <td>Rp 20.000</td>
-                            <td>per m²</td>
-                            <td><span class="status-badge status-ready">Aktif</span></td>
-                        </tr>
-                    </tbody>
-                </table>
+        async function manageServices() {
+            try {
+                    const resListLayanan = await fetch(`get-list-layanan`);
+                    const dataListLayanan = await resListLayanan.json();
 
-                <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn btn-primary" onclick="alert('Fitur akan segera tersedia!')">
-                        ➕ Tambah Layanan Baru
-                    </button>
-                </div>
-            `;
+                    console.log(dataListLayanan)
+                    // Buat baris HTML untuk setiap layanan
+
+                    // <span class="status-badge ${layanan.status === 'Aktif' ? 'status-ready' : 'status-pending'}">
+                    //     ${layanan.status}
+                    // </span>
+        const layananRows = dataListLayanan.map(layanan => `
+            <tr>
+                <td>${layanan.service_name}</td>
+                <td>Rp ${parseInt(layanan.price).toLocaleString('id-ID')}</td>
+                <td>kg</td>
+                <td>
+                    <span class="status-badge status-ready">
+                        Ready
+                    </span>
+                </td>
+            </tr>
+        `).join('');
+
+        const servicesHtml = `
+            <h2>⚙️ Kelola Layanan</h2>
+            <p>Fitur ini memungkinkan Anda mengelola jenis layanan dan harga.</p>
+
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Layanan</th>
+                        <th>Harga</th>
+                        <th>Satuan</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${layananRows}
+                </tbody>
+            </table>
+
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn btn-primary" onclick="alert('Fitur akan segera tersedia!')">
+                    ➕ Tambah Layanan Baru
+                </button>
+            </div>
+        `;
+
 
             document.getElementById('modalContent').innerHTML = servicesHtml;
             document.getElementById('transactionModal').style.display = 'block';
+                } catch (err) {
+                    console.error('Fetch error:', err);
+                }
         }
 
         function updateTransactionStatus(transactionId) {
-            const transaction = transactions.find(t => t.id === transactionId);
+            const transaction = transactions.find(t => t.id_order === transactionId);
             if (!transaction) return;
 
             const statusOptions = [
-                { value: 'pending', text: 'Menunggu' },
-                { value: 'process', text: 'Sedang Proses' },
-                { value: 'ready', text: 'Siap Diambil' },
-                { value: 'delivered', text: 'Selesai' }
+                { value: 1, text: 'Menunggu' },
+                { value: 2, text: 'Sedang Proses' },
+                { value: 3, text: 'Siap Diambil' },
+                { value: 4, text: 'Selesai' }
             ];
 
             const statusHtml = `
                 <h2>📝 Update Status Transaksi</h2>
                 <h3>${transaction.id} - ${transaction.customer.name}</h3>
-                <p>Status saat ini: <span class="status-badge status-${transaction.status}">${getStatusText(transaction.status)}</span></p>
+                <p>Status saat ini: <span class="status-badge status-${transaction.order_status}">${getStatusText(transaction.order_status)}</span></p>
 
                 <div class="form-group">
                     <label>Pilih Status Baru:</label>
                     <select id="newStatus" style="width: 100%; padding: 10px; margin: 10px 0;">
                         ${statusOptions.map(option => `
-                            <option value="${option.value}" ${transaction.status === option.value ? 'selected' : ''}>
+                            <option value="${option.value}" ${transaction.order_status === option.value ? 'selected' : ''}>
                                 ${option.text}
                             </option>
                         `).join('')}
@@ -1083,7 +1108,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn btn-success" onclick="saveStatusUpdate('${transactionId}')">
+                    <button class="btn btn-success" onclick="saveStatusUpdate(${transactionId})">
                         ✅ Simpan Update
                     </button>
                     <button class="btn btn-danger" onclick="closeModal()" style="margin-left: 10px;">
@@ -1096,18 +1121,47 @@
             document.getElementById('transactionModal').style.display = 'block';
         }
 
-        function saveStatusUpdate(transactionId) {
+        async function saveStatusUpdate(transactionId) {
             const newStatus = document.getElementById('newStatus').value;
-            const transactionIndex = transactions.findIndex(t => t.id === transactionId);
+            console.log(transactionId)
+            let url = `/transaksi/${transactionId}/status`;
+            // const transactionIndex = transactions.findIndex(t => t.id === transactionId);
 
-            if (transactionIndex !== -1) {
-                transactions[transactionIndex].status = newStatus;
-                localStorage.setItem('laundryTransactions', JSON.stringify(transactions));
-                updateTransactionHistory();
-                updateStats();
+            try {
+                const resStatus = await fetch(`/transaksi/${transactionId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                            "content")
+                    },
+                    body: JSON.stringify({
+                        order_status: newStatus
+                    })
+                })
+
+                if (!resStatus.ok) {
+                    throw new Error(`HTTP error!! Status: ${resStatus.status}`)
+                }
+
+                // const result = await resStatus.json();
                 closeModal();
-                alert('Status berhasil diupdate!');
+                alert("Status Transaksi Berhasil diupdate!!")
+
+                // loadDataTransactions();
+
+            } catch (error) {
+                console.error("Gagal Menyimpan Data Transaksi: ", error)
             }
+            // if (transactionIndex !== -1) {
+            //     transactions[transactionIndex].status = newStatus;
+
+            //     localStorage.setItem('laundryTransactions', JSON.stringify(transactions));
+            //     updateTransactionHistory();
+            //     updateStats();
+            //     closeModal();
+            //     alert('Status berhasil diupdate!');
+            // }
         }
 
         function closeModal() {
@@ -1159,19 +1213,21 @@
             const weightValue = document.getElementById('serviceWeight').value;
             const weight = parseDecimal(weightValue);
             const notes = document.getElementById('notes').value;
+            const serviceSelect = document.getElementById('serviceType');
+            const serviceID = serviceSelect.options[serviceSelect.selectedIndex].getAttribute('data-id');
 
             if (!serviceType || !weightValue || weight <= 0) {
                 alert('Mohon lengkapi semua field yang diperlukan!');
                 return;
             }
 
-             const prices = LayananPrice;
+            const prices = LayananPrice;
 
             const price = prices[serviceType];
             const subtotal = price * weight;
 
             const item = {
-                id: Date.now(),
+                id: serviceID,
                 service: serviceType,
                 weight: weight,
                 price: price,
@@ -1234,33 +1290,29 @@
         }
 
         // Add some sample data for demonstration
-        function addSampleData() {
-            const sampleTransactions = [
-                {
-                    id: 'TRX-001',
-                    customer: { name: 'John Doe', phone: '0812-3456-7890', address: 'Jl. Merdeka 123' },
-                    items: [{ service: 'Cuci Setrika', weight: 2.5, price: 7000, subtotal: 17500 }],
-                    total: 17500,
-                    date: new Date().toISOString(),
-                    status: 'process'
-                },
-                {
-                    id: 'TRX-002',
-                    customer: { name: 'Jane Smith', phone: '0813-7654-3210', address: 'Jl. Sudirman 456' },
-                    items: [{ service: 'Cuci Kering', weight: 3, price: 5000, subtotal: 15000 }],
-                    total: 15000,
-                    date: new Date(Date.now() - 3600000).toISOString(),
-                    status: 'ready'
+        async function loadDataTransactions() {
+
+            try {
+                const resTrans = await fetch("{{ route('getTransaksi') }}")
+
+                if (!resTrans.ok) {
+                    throw new Error(`HTTP error!! Status:${resTrans.status}`);
                 }
-            ];
 
-            if (transactions.length === 0) {
-                transactions = sampleTransactions;
-                localStorage.setItem('laundryTransactions', JSON.stringify(transactions));
-                transactionCounter = transactions.length + 1;
+                const result = await resTrans.json();
+
+                transactions = result;
+                transactionCounter = transactions.length + 1
+                console.log(transactions)
+            } catch (error) {
+                console.error("Gagal Memuat Data Transaksi: ", error)
             }
-        }
+            updateTransactionHistory();
+            updateStats();
 
-        // Initialize with sample data
-        addSampleData();
+        };
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDataTransactions();
+        });
+
 </script>

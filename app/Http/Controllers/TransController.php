@@ -233,6 +233,7 @@ class TransController extends Controller
     {
         $laundryCustomer = Customer::get();
         $laundryLayanan = Type_of_service::get();
+
         return view('admin.transaksi.laundry-trans', compact('laundryLayanan', 'laundryCustomer'));
     }
 
@@ -276,27 +277,31 @@ class TransController extends Controller
 
     public function LaundryStore(Request $request)
     {
+        // $request->validate([
+        //     'id' => 'required|string|unique:trans_orders,order_code',
+        //     'customer.id' => 'required|exists:customers,id',
+        //     'items' => 'required|array|min:1',
+        //     'order_date' => 'required|date',
+        //     'order_status' => 'required',
+        //     'total' => 'required|numeric|min:0'
+        // ]);
+
         DB::beginTransaction();
 
         try {
-            // Simpan order utama
             $order = Trans_order::create([
-                'id_customer' => $request->id_customer,
-                'order_code' => $request->trans_code,
-                'order_date' => now(),
-                'order_end_date' => null,
-
-                'order_pay' => 0,
-                'order_change' => 0,
+                'order_code' => $request->id,
+                'id_customer' => $request->customer['id'],
+                'order_date' => \Carbon\Carbon::now(),
+                'order_status' => $request->order_status,
                 'total' => $request->total
             ]);
 
-            // Simpan detail order
             foreach ($request->items as $item) {
                 Trans_order_detail::create([
-                    'id_order' => $item->id,
-                    'id_service' => $item['id'],     // pastikan item punya ID service
-                    'qty' => $item['qty'],
+                    'id_order' => $order->id,
+                    'id_service' => $item['id'],
+                    'qty' => $item['weight'],
                     'subtotal' => $item['subtotal'],
                     'notes' => $item['notes'] ?? null
                 ]);
@@ -308,17 +313,97 @@ class TransController extends Controller
                 'success' => true,
                 'message' => 'Transaksi berhasil disimpan',
                 'data' => $order
-            ]);
-        } catch (\Exception $e) {
+            ], 201);
+        } catch (\Throwable $th) {
             DB::rollBack();
-
-
-            return $request;
-            // return response()->json([
-            //     'success' => false,
-            //     'message' => 'Terjadi kesalahan saat menyimpan',
-            //     'error' => $e->getMessage()
-            // ], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal Menyimpan Traansaksi',
+                'error' => $th->getMessage()
+            ], 522);
         }
+    }
+
+    public function getTransaksi()
+    {
+        $transactions = Trans_order::with(['customer', 'detailOrder.service'])->get();
+        $data = $transactions->map(function ($trx) {
+            return [
+                'id_order' => $trx->id,
+                'id' => $trx->order_code,
+                'customer' => [
+                    'id' => $trx->customer->id ?? null,
+                    'name' => $trx->customer->customer_name ?? null,
+                    'phone' => $trx->customer->phone ?? null,
+                    'address' => $trx->customer->address ?? null,
+                ],
+                'items' => $trx->detailOrder->map(function ($orderDetail) {
+                    return [
+                        'id' => $orderDetail->id,
+                        'service' => $orderDetail->service->service_name ?? null,
+                        'weight' => $orderDetail->qty,
+                        'price' => $orderDetail->service->price ?? null,
+                        'subtotal' => $orderDetail->subtotal,
+                        'notes' => $orderDetail->notes ?? null
+                    ];
+                }),
+                'total' => $trx->total,
+                'date' => $trx->order_date ?? null,
+                'order_status' => $trx->order_status,
+            ];
+        });
+        return response()->json($data);
+    }
+
+    public function setStatus(Request $request, $id)
+    {
+        $request->validate([
+            'order_status' => 'required|in:1,2,3,4' // misalnya ada banyak status
+        ]);
+
+        try {
+            DB::transaction(function () use ($request, $id) {
+                $order = Trans_order::where('id', $id)->firstOrFail();
+
+                $order->update([
+                    'order_pay' => $order->total,
+                    'order_status' => $request->order_status,
+
+                ]);
+
+                if ($request->order_status == 3) {
+                    $order->update([
+                        'order_end_date' => \Carbon\Carbon::now()->toDateString()
+                    ]);
+                }
+
+                if ($request->order_status == 4) {
+                    Trans_order_detail::create([
+                        'id_order' => $order->id,
+                        'id_customer' => $order->id_customer,
+                        'pickup_date' => Carbon::now(),
+                        'notes' => $request->notes ?? null,
+                    ]);
+                }
+            });
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Status berhasil diupdate',
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error' . $th->getMessage(),
+                'id' => $id,
+                'order_status' => $request->order_status,
+            ], 500);
+        }
+    }
+
+    public function listLayanan()
+    {
+        $service = Type_of_service::all();
+        return response()->json($service);
     }
 }
