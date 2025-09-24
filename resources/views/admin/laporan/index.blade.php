@@ -127,7 +127,7 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover table-borderless mb-0">
-                    <div class=" d-flex justify-content-center gap-2">
+                    <div class=" d-flex justify-content-center gap-2    ">
                        <form method="GET" action="{{ route('laporan.index') }}" >
                             <div class="col-md-3">
                                 <label>Dari Tanggal</label>
