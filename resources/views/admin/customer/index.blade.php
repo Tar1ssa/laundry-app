@@ -66,7 +66,7 @@
                         {{--<a href="{{ route('Customer.index', ['edit' => $dataCustomer->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <a href="#" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></a>
+                            {{-- <a href="#" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></a> --}}
                             <a href="{{ route('customer.edit', $dataCustomer->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div> </a>
                             <form onclick="return confirm('Yakin ingin menghapus {{ $dataCustomer->customer_name }} ?')" action="{{ route('customer.destroy', $dataCustomer->id) }}" method="post" class="d-inline">
                                     @csrf

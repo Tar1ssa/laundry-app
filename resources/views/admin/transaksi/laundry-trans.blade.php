@@ -461,7 +461,7 @@
 
                             <button type="button" class="service-card" onclick="addService('{{ $keylayanan->service_name }}', {{ $keylayanan->price }})">
                                 <h3>{{ $keylayanan->service_name }}</h3>
-                                <div class="price">Rp {{ $keylayanan->price }}/kg</div>
+                                <div class="price">Rp {{ number_format($keylayanan->price , 0, ',','.') }}/kg</div>
                             </button>
                             @endforeach
 
@@ -563,15 +563,26 @@
 
         <!-- Action Buttons -->
         <div style="text-align: center; margin-top: 20px;">
+            @if ( auth()->check() && auth()->user()->isPimpinan())
             <button class="btn btn-primary" onclick="showReports()" style="margin: 0 10px;">
                 📈 Laporan Penjualan
             </button>
+
+            @endif
+
+            @if (auth()->check() && auth()->user()->isAdmin())
+
             <button class="btn btn-warning" onclick="manageServices()" style="margin: 0 10px;">
                 ⚙️ Kelola Layanan
             </button>
+            @endif
             <button class="btn btn-danger" onclick="clearCart()" style="margin: 0 10px;">
                 🗑️ Bersihkan Keranjang
             </button>
+            <a href="{{ route('transaksi.index') }} " class="btn btn-success text-decoration-none" style="margin: 0 10px;">
+                Kembali ke admin panel
+            </a>
+
         </div>
     </div>
 
@@ -819,6 +830,7 @@
                 console.log(data.message);
                 showReceipt(transaction);
                 updateTransactionHistory();
+                loadDataTransactions();
                 updateStats();
 
             } catch (error) {
@@ -915,8 +927,8 @@
         function updateStats() {
             const totalTransactions = transactions.length;
             const totalRevenue = transactions.reduce((sum, t) => sum + t.total, 0);
-            const activeOrders = transactions.filter(t => t.order_status !== 1).length;
-            const completedOrders = transactions.filter(t => t.order_status == 1).length;
+            const activeOrders = transactions.filter(t => t.order_status !== 4).length;
+            const completedOrders = transactions.filter(t => t.order_status == 4).length;
 
             document.getElementById('totalTransactions').textContent = totalTransactions;
             document.getElementById('totalRevenue').textContent = `Rp ${totalRevenue.toLocaleString()}`;
@@ -1066,9 +1078,9 @@
             </table>
 
             <div style="text-align: center; margin-top: 20px;">
-                <button class="btn btn-primary" onclick="alert('Fitur akan segera tersedia!')">
+                <a class="btn btn-primary text-decoration-none" {{ route('service.index') }}>
                     ➕ Tambah Layanan Baru
-                </button>
+                </a>
             </div>
         `;
 
@@ -1108,7 +1120,7 @@
                 </div>
 
                 <div style="text-align: center; margin-top: 20px;">
-                    <button class="btn btn-success" onclick="saveStatusUpdate(${transactionId})">
+                    <button class="btn btn-success" onclick="saveStatusUpdate(${transactionId}, ${transaction.order_pay})">
                         ✅ Simpan Update
                     </button>
                     <button class="btn btn-danger" onclick="closeModal()" style="margin-left: 10px;">
@@ -1121,9 +1133,10 @@
             document.getElementById('transactionModal').style.display = 'block';
         }
 
-        async function saveStatusUpdate(transactionId) {
+        async function saveStatusUpdate(transactionId, order_pay) {
             const newStatus = document.getElementById('newStatus').value;
             console.log(transactionId)
+
             let url = `/transaksi/${transactionId}/status`;
             // const transactionIndex = transactions.findIndex(t => t.id === transactionId);
 
@@ -1136,7 +1149,8 @@
                             "content")
                     },
                     body: JSON.stringify({
-                        order_status: newStatus
+                        order_status: newStatus,
+                        order_pay: order_pay
                     })
                 })
 
@@ -1144,9 +1158,12 @@
                     throw new Error(`HTTP error!! Status: ${resStatus.status}`)
                 }
 
+                console.log(order_pay);
                 // const result = await resStatus.json();
+                loadDataTransactions();
                 closeModal();
                 alert("Status Transaksi Berhasil diupdate!!")
+
 
                 // loadDataTransactions();
 

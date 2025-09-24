@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Trans_order;
+use App\Models\Trans_order_detail;
+use App\Models\Type_of_service;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
@@ -11,8 +15,31 @@ class LaporanController extends Controller
      */
     public function index()
     {
+        // Total transaksi (jumlah order)
+        $totalTransactions = Trans_order::count();
 
-        return view('admin.laporan.index');
+        // Total transaksi bulan ini
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $transactionsThisMonth = Trans_order::whereYear('order_date', $currentYear)
+            ->whereMonth('order_date', $currentMonth)
+            ->count();
+
+        // Pendapatan bulan ini (sum total dari transaksi bulan ini)
+        $incomeThisMonth = Trans_order::whereYear('order_date', $currentYear)
+            ->whereMonth('order_date', $currentMonth)
+            ->sum('total');
+
+        $services = Type_of_service::with('orderDetails')->get();
+
+        $services->transform(function ($service) {
+            $service->total_qty = $service->orderDetails->count('id');
+            $service->total_revenue = $service->orderDetails->sum('subtotal');
+            return $service;
+        });
+
+        // return $services;
+        return view('admin.laporan.index', compact('totalTransactions', 'transactionsThisMonth', 'incomeThisMonth', 'services'));
     }
 
     /**

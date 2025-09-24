@@ -55,5 +55,7 @@ Route::middleware('auth')->group(function () {
         Route::post('ready', [PickupController::class, 'ready'])->name('pickup.ready');
     });
 
-    Route::resource('laporan', LaporanController::class);
+    Route::middleware('role:Pimpinan')->group(function () {
+        Route::resource('laporan', LaporanController::class);
+    });
 });

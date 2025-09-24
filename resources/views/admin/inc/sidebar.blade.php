@@ -1,9 +1,10 @@
 <nav class="pc-sidebar">
   <div class="navbar-wrapper">
     <div class="m-header">
-      <a href="../dashboard/index.html" class="b-brand text-primary">
+      <a href="{{ route('dashboard.index') }}" class="b-brand text-primary">
         <!-- ========   Change your logo from here   ============ -->
-        <img src="../assets/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo">
+        <h3>LaundryMyAdmin</h3>
+        {{-- <img src="../assets/images/logo-dark.svg" class="img-fluid logo-lg" alt="logo"> --}}
       </a>
     </div>
     <div class="navbar-content">
@@ -33,7 +34,7 @@
               <a href="#!" class="pc-link">User<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
               <ul class="pc-submenu">
                 <li class="pc-item"><a class="pc-link" href="{{ route('user.index') }}">Users</a></li>
-                <li class="pc-item"><a class="pc-link" href="{{ route('level.index') }}">Levels</a></li>
+                {{-- <li class="pc-item"><a class="pc-link" href="{{ route('level.index') }}">Levels</a></li> --}}
               </ul>
             </li>
           </ul>
@@ -51,8 +52,13 @@
             </ul>
         </li>
         @endif
-      </ul>
 
+        @if (auth()->check() && auth()->user()->isPimpinan())
+        <li class="pc-item ">
+          <a href="{{ route('laporan.index') }}" class="pc-link"><span class="pc-micon"><i class="ti ti-report-analytics"></i></span><span class="pc-mtext">Laporan</span></a>
+        </li>
+      </ul>
+      @endif
     </div>
   </div>
 </nav>

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Trans_order;
+use App\Models\User;
 
 class DashboardController extends Controller
 {
@@ -11,7 +13,10 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('admin.dashboard.index');
+        $order_selesai = Trans_order::where('order_status', 4)->get();
+        $order_berjalan = Trans_order::where('order_status', '!=', 4)->get();
+        $total_user = User::all();
+        return view('admin.dashboard.index', compact('order_selesai', 'order_berjalan', 'total_user'));
     }
 
     /**

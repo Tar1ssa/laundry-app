@@ -15,5 +15,10 @@ class Type_of_service extends Model
         'description',
     ];
 
+    public function orderDetails()
+    {
+        return $this->hasMany(Trans_order_detail::class, 'id_service', 'id');
+    }
+
     protected $date = ['deleted_at'];
 }

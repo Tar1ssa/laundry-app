@@ -3,7 +3,7 @@
 <!-- [Head] start -->
 
 <head>
-  <title>Login | Mantis Bootstrap 5 Admin Template</title>
+  <title>Login | LaundryMyAdmin</title>
   <!-- [Meta] -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
@@ -44,7 +44,8 @@
     <div class="auth-wrapper v3">
       <div class="auth-form">
         <div class="auth-header">
-          <a href="#"><img src="../assets/images/logo-dark.svg" alt="img"></a>
+            <h3>LaundryMyAdmin</h3>
+          {{-- <a href="#"><img src="../assets/images/logo-dark.svg" alt="img"></a> --}}
         </div>
         <form action="{{route('actionLogin')}}" method="post">
             @csrf
@@ -79,7 +80,7 @@
         </div>
         <div class="auth-footer row">
           <!-- <div class=""> -->
-            <div class="col my-1">
+            {{-- <div class="col my-1">
               <p class="m-0">Copyright © <a href="#">Codedthemes</a></p>
             </div>
             <div class="col-auto my-1">
@@ -88,7 +89,7 @@
                 <li class="list-inline-item"><a href="#">Privacy Policy</a></li>
                 <li class="list-inline-item"><a href="#">Contact us</a></li>
               </ul>
-            </div>
+            </div> --}}
           <!-- </div> -->
         </div>
       </div>

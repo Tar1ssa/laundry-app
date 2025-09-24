@@ -21,7 +21,7 @@ class TransController extends Controller
      */
     public function index()
     {
-        $Transaksi = Trans_order::with('customer')->orderBy('id', 'desc')->get();
+        $Transaksi = Trans_order::with('customer', 'detailOrder.service')->orderBy('id', 'desc')->get();
         $title = 'Data Transaksi';
         return view('admin.transaksi.index', compact('Transaksi', 'title'));
     }
@@ -173,7 +173,7 @@ class TransController extends Controller
             $trans->order_pay = $request->order_pay;
             if ($request->order_pay > $trans->total) {
                 $trans->order_end_date = \Carbon\Carbon::now();
-                if ($trans->order_end_date && $trans->order_status == 2) {
+                if ($trans->order_end_date && $trans->order_status == 3) {
                     Trans_laundry_pickup::create([
                         'id_order' => $trans->id
                     ]);
@@ -206,15 +206,15 @@ class TransController extends Controller
     public function done(Request $request, string $id)
     {
         $done = Trans_order::find($id);
-        $done->order_status = 2;
+        $done->order_status = 3;
         $done->save();
-        if ($done->order_status == 2 && $done->order_end_date) {
+        if ($done->order_status == 3 && $done->order_end_date) {
             Trans_laundry_pickup::create([
                 'id_order' => $done->id
             ]);
         }
-        Alert::success('Sukses!', 'Transaksi ditandakan selesai!');
-        return redirect()->back()->with('Sukses!', 'Transaksi ditandakan selesai!');
+        Alert::success('Sukses!', 'Order siap diambil!');
+        return redirect()->back()->with('Sukses!', 'Order siap diambil!');
     }
 
     /**
@@ -223,7 +223,10 @@ class TransController extends Controller
     public function destroy(string $id)
     {
         $Trans = Trans_order::find($id);
-        $Trans->detailOrder()->delete();
+        $detailOrder = Trans_order_detail::where('id_order', $Trans->id);
+        $pickup = Trans_laundry_pickup::where('id_order', $Trans->id);
+        $pickup->delete();
+        $detailOrder->delete();
         $Trans->delete();
         Alert::success('Sukses!', 'Transaksi berhasil dibatalkan!');
         return redirect()->to('transaksi');
@@ -347,6 +350,7 @@ class TransController extends Controller
                         'notes' => $orderDetail->notes ?? null
                     ];
                 }),
+                'order_pay' => $trx->order_pay ?? null,
                 'total' => $trx->total,
                 'date' => $trx->order_date ?? null,
                 'order_status' => $trx->order_status,
@@ -361,35 +365,27 @@ class TransController extends Controller
             'order_status' => 'required|in:1,2,3,4' // misalnya ada banyak status
         ]);
 
+
+
         try {
             DB::transaction(function () use ($request, $id) {
                 $order = Trans_order::where('id', $id)->firstOrFail();
-
                 $order->update([
-                    'order_pay' => $order->total,
                     'order_status' => $request->order_status,
-
                 ]);
-
-                if ($request->order_status == 3) {
-                    $order->update([
-                        'order_end_date' => \Carbon\Carbon::now()->toDateString()
-                    ]);
-                }
-
-                if ($request->order_status == 4) {
-                    Trans_order_detail::create([
-                        'id_order' => $order->id,
-                        'id_customer' => $order->id_customer,
-                        'pickup_date' => Carbon::now(),
-                        'notes' => $request->notes ?? null,
-                    ]);
-                }
             });
+
+            $order = Trans_order::where('id', $id)->firstOrFail();
+            if ($request->order_status == 3 && $request->order_pay) {
+                Trans_laundry_pickup::create([
+                    'id_order' => $order->id,
+                ]);
+            }
 
             return response()->json([
                 'status' => true,
                 'message' => 'Status berhasil diupdate',
+                'pay' => $order->order_pay
             ]);
         } catch (\Throwable $th) {
             return response()->json([

@@ -43,8 +43,32 @@
             </div>
           </div>
         </div>
-        @endif
+         <div class="col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <h6 class="mb-2 f-w-400 text-muted">Total user</h6>
+              <h4 class="mb-3">{{ count($total_user)}}</h4>
+            </div>
+          </div>
+        </div>
+         <div class="col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <h6 class="mb-2 f-w-400 text-muted">Order berlangsung</h6>
+              <h4 class="mb-3">{{ count($order_berjalan)  }}</h4>
+            </div>
+          </div>
+        </div>
         <div class="col-md-6 col-xl-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <h6 class="mb-2 f-w-400 text-muted">Order selesai</h6>
+              <h4 class="mb-3">{{ count($order_berjalan)  }}</h4>
+            </div>
+          </div>
+        </div>
+        @endif
+        {{-- <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
               <h6 class="mb-2 f-w-400 text-muted">Total Users</h6>
@@ -74,9 +98,9 @@
               </p>
             </div>
           </div>
-        </div>
+        </div> --}}
 
-        <div class="col-md-12 col-xl-8">
+        {{-- <div class="col-md-12 col-xl-8">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <h5 class="mb-0">Unique Visitor</h5>
             <ul class="nav nav-pills justify-content-end mb-0" id="chart-tab-tab" role="tablist">
@@ -312,7 +336,7 @@
               </a>
             </div>
           </div>
-        </div>
+        </div> --}}
       </div>
     </div>
 @endsection

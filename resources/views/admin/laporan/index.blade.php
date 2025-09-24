@@ -13,8 +13,7 @@
               </div>
               <ul class="breadcrumb">
                 <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
-                <li class="breadcrumb-item"><a href="javascript: void(0)">Dashboard</a></li>
-                <li class="breadcrumb-item" aria-current="page">Home</li>
+                <li class="breadcrumb-item" aria-current="page"><a href="javascript: void(0)">Laporan</a></li>
               </ul>
             </div>
           </div>
@@ -36,13 +35,16 @@
             </div>
         @endif
         <!-- [ sample-page ] start -->
-        <div class="col-md-6 col-xl-3">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Page Views</h6>
-              <h4 class="mb-3">4,42,236 <span class="badge bg-light-primary border border-primary"><i
-                    class="ti ti-trending-up"></i> 59.3%</span></h4>
-              <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">35,000</span> this year
+              <h6 class="mb-2 f-w-400 text-muted">Total Transaksi</h6>
+              <h4 class="mb-3">{{ $totalTransactions }}
+                {{-- <span class="badge bg-light-primary border border-primary">
+                <i class="ti ti-trending-up"></i> 59.3%</span> --}}
+            </h4>
+              {{-- <p class="mb-0 text-muted text-sm">You made an extra <span class="text-primary">35,000</span> this year --}}
               </p>
             </div>
           </div>
@@ -50,24 +52,27 @@
         <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Users</h6>
-              <h4 class="mb-3">78,250 <span class="badge bg-light-success border border-success"><i
-                    class="ti ti-trending-up"></i> 70.5%</span></h4>
-              <p class="mb-0 text-muted text-sm">You made an extra <span class="text-success">8,900</span> this year</p>
+              <h6 class="mb-2 f-w-400 text-muted">Transaksi Bulan Ini</h6>
+              <h4 class="mb-3">{{ $transactionsThisMonth }}
+                {{-- <span class="badge bg-light-success border border-success">
+                    <i class="ti ti-trending-up"></i> 70.5%</span> --}}
+                </h4>
+              {{-- <p class="mb-0 text-muted text-sm">You made an extra <span class="text-success">8,900</span> this year</p> --}}
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Total Order</h6>
-              <h4 class="mb-3">18,800 <span class="badge bg-light-warning border border-warning"><i
-                    class="ti ti-trending-down"></i> 27.4%</span></h4>
-              <p class="mb-0 text-muted text-sm">You made an extra <span class="text-warning">1,943</span> this year</p>
+              <h6 class="mb-2 f-w-400 text-muted">Pendapatan Bulan ini</h6>
+              <h4 class="mb-3">{{ "Rp.". number_format($incomeThisMonth, 2, ',','.')  }}
+                {{-- <span class="badge bg-light-warning border border-warning"><i class="ti ti-trending-down"></i> 27.4%</span> --}}
+            </h4>
+              {{-- <p class="mb-0 text-muted text-sm">You made an extra <span class="text-warning">1,943</span> this year</p> --}}
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-xl-3">
+        {{-- <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
               <h6 class="mb-2 f-w-400 text-muted">Total Sales</h6>
@@ -77,9 +82,11 @@
               </p>
             </div>
           </div>
+        </div> --}}
         </div>
 
-        <div class="col-md-12 col-xl-8">
+
+        {{-- <div class="col-md-12 col-xl-8">
           <div class="d-flex align-items-center justify-content-between mb-3">
             <h5 class="mb-0">Unique Visitor</h5>
             <ul class="nav nav-pills justify-content-end mb-0" id="chart-tab-tab" role="tablist">
@@ -118,117 +125,40 @@
               <div id="income-overview-chart"></div>
             </div>
           </div>
-        </div>
+        </div> --}}
 
-        <div class="col-md-12 col-xl-8">
-          <h5 class="mb-3">Recent Orders</h5>
+        <div class="col-md-12 col-xl-12">
+          <h5 class="mb-3">Statistik Layanan</h5>
           <div class="card tbl-card">
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover table-borderless mb-0">
                   <thead>
                     <tr>
-                      <th>TRACKING NO.</th>
-                      <th>PRODUCT NAME</th>
-                      <th>TOTAL ORDER</th>
-                      <th>STATUS</th>
-                      <th class="text-end">TOTAL AMOUNT</th>
+                      <th>No.</th>
+                      <th>Layanan</th>
+                      <th>Jumlah order</th>
+                      <th class="text-end">Total pendapatan</th>
+
                     </tr>
                   </thead>
                   <tbody>
+                    @foreach ( $services as $index => $keyservice)
+
                     <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
+                      <td>{{ $index += 1 }}</td>
+                      <td>{{ $keyservice->service_name }}</td>
+                      <td>{{ $keyservice->total_qty }}</td>
+                      <td class="text-end">{{ $keyservice->total_revenue }}</td>
                     </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Camera Lens</td>
-                      <td>40</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-danger f-10 m-r-5"></i>Rejected</span>
-                      </td>
-                      <td class="text-end">$40,570</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Laptop</td>
-                      <td>300</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-warning f-10 m-r-5"></i>Pending</span>
-                      </td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
-                    <tr>
-                      <td><a href="#" class="text-muted">84564564</a></td>
-                      <td>Mobile</td>
-                      <td>355</td>
-                      <td><span class="d-flex align-items-center gap-2"><i
-                            class="fas fa-circle text-success f-10 m-r-5"></i>Approved</span></td>
-                      <td class="text-end">$180,139</td>
-                    </tr>
+                    @endforeach
                   </tbody>
                 </table>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-md-12 col-xl-4">
+        {{-- <div class="col-md-12 col-xl-4">
           <h5 class="mb-3">Analytics Report</h5>
           <div class="card">
             <div class="list-group list-group-flush">
@@ -315,7 +245,7 @@
               </a>
             </div>
           </div>
-        </div>
+        </div> --}}
       </div>
     </div>
 @endsection

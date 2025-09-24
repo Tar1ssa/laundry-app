@@ -32,7 +32,11 @@
               <div class="card-header d-flex justify-content-between">
                 <h3>Data Transaksi</h3>
                 {{-- laundry trans button --}}
-                <a href="{{ route('laundry.transc') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
+                <div>
+
+                    <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
+                    <a href="{{ route('laundry.transc') }}" class="btn btn-shadow btn-info">Sistem informasi laundry</a>
+                </div>
                 {{-- end laundry trans button --}}
                 {{-- <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a> --}}
 
@@ -54,17 +58,36 @@
                       </tr>
                     </thead>
                     <tbody>
-                        {{-- @php
-                            $statusList = [
-                                1 => 'Menunggu',
-                                2 => 'Diproses',
-                                3 => 'Siap Diambil',
-                                4 => 'Selesai',
-                            ];
 
-                            $statusText = $statusList[$order->status] ?? 'Status Tidak Diketahui';
-                        @endphp --}}
                         @foreach ($Transaksi as $index => $dataTransaksi)
+                        @php
+                            switch ($dataTransaksi) {
+                                case $dataTransaksi->order_status == 1:
+                                    $order_status = 'Menunggu';
+                                    $order_badge = 'bg-light-secondary';
+                                    break;
+
+                                case $dataTransaksi->order_status == 2:
+                                    $order_status = 'Proses';
+                                    $order_badge = 'bg-light-warning';
+                                    break;
+
+                                case $dataTransaksi->order_status == 3:
+                                    $order_status = 'Siap diambil';
+                                    $order_badge = 'bg-light-primary';
+                                    break;
+
+                                case $dataTransaksi->order_status == 4:
+                                    $order_status = 'Selesai';
+                                    $order_badge = 'bg-light-success';
+                                    break;
+
+                                default:
+                                    $order_status = 'tidak diketahui';
+                                    break;
+                            }
+                        @endphp
+
                       <tr>
                         <td>{{ $index +=1 }}</td>
                         <td>{{ $dataTransaksi->order_code}}</td>
@@ -73,18 +96,30 @@
                         <td>{{ $dataTransaksi->order_end_date ? $dataTransaksi->order_end_date : "belum selesai" }}</td>
                         <td>
                             <ul class="list-unstyled">
-                                <li><span class="badge {{ $dataTransaksi->order_status == 2 ? "bg-light-success" : "bg-light-secondary" }}">{{ $dataTransaksi->order_status == 2 ? "order selesai" : "order belum selesai" }}</span></li>
+                                <li><span class="badge {{ $order_badge }}">{{ $order_status }}</span></li>
                                 <li><span class="badge {{ $dataTransaksi->order_end_date ? "bg-light-success" : "bg-light-secondary" }} ">{{ $dataTransaksi->order_end_date ? "lunas" : "belum lunas" }}</span></li>
                             </ul>
                             </td>
                         <td>
-                        {{--<a href="{{ route('Transaksi.index', ['edit' => $dataTransaksi->id]) }}" class="btn btn-sm btn-warning">
-                            Edit
-                            </a> --}}
-                            <form onclick="return confirm('Yakin ingin menandai transaksi {{ $dataTransaksi->order_code }} selesai ?')" action="{{ route('transaksi.done', $dataTransaksi->id) }}" method="post" class="d-inline">
+                            @if ($dataTransaksi->order_pay)
+                                @php
+                                    $total = $dataTransaksi->detailOrder->sum('subtotal');
+                                    $dataWithTotal = $dataTransaksi->toArray();
+                                    $dataWithTotal['total'] = $total;
+                                @endphp
+                            <button
+                                type="button"
+                                class="btn btn-shadow btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#exampleModal"
+                                onclick='showReceipt(@json($dataWithTotal))'>
+                                Print Struk
+                            </button>
+                            @endif
+                            <form onclick="return confirm('Yakin ingin menandai transaksi {{ $dataTransaksi->order_code }} siap diambil ?')" action="{{ route('transaksi.done', $dataTransaksi->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('PUT')
-                                <button class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-check fs-5 text-white"></i>Tandai selesai</div></button>
+                                <button class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-check fs-5 text-white"></i>Tandai siap diambil</div></button>
 
                             </form>
                             <a href="{{route('transaksi.show',$dataTransaksi->id)}}" class="btn btn-shadow {{ $dataTransaksi->order_end_date ? "btn-success" : 'btn-outline-success' }} "><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti {{ $dataTransaksi->order_end_date ? "ti-history text-white" : 'ti-cash text-green' }}  fs-5  "></i>{{ $dataTransaksi->order_end_date ? "Detail transaksi" : 'Bayar transaksi' }}</div></a>
@@ -107,6 +142,28 @@
         </div>
         <!-- [ Main Content ] end -->
       </div>
+
+      <!-- Button trigger modal -->
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Struk</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="modal-content">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Selesai</button>
+        <button type="button" class="btn btn-primary" onclick="printReceipt()">Print</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 {{-- @section('modal-create')
@@ -206,6 +263,96 @@
 {{-- @endsection --}}
 
 @section('js')
+
+<script>
+    function showReceipt(transaction) {
+        const receiptHtml = `
+            <div class="receipt">
+                <div class="receipt-header">
+                    <h2>🧺 LAUNDRY RECEIPT</h2>
+                    <p>No. Transaksi: ${transaction.order_code}</p>
+                    <p>Tanggal: ${new Date(transaction.order_date).toLocaleDateString('id-ID')}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <strong>Pelanggan:</strong><br>
+                    ${transaction.customer.customer_name}<br>
+                    ${transaction.customer.phone ?? ''}<br>
+                    ${transaction.customer.address ?? ''}
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <strong>Detail Pesanan:</strong><br>
+                    ${
+                        transaction.detailOrder?.map(item => `
+                            <div class="receipt-item d-flex justify-content-between">
+                                <span>${item.service?.service_name ?? 'Layanan tidak diketahui'} (${item.weight} kg)</span>
+                                <span>Rp ${Number(item.subtotal).toLocaleString('id-ID')}</span>
+                            </div>
+                        `).join('') ?? '<em>Tidak ada item</em>'
+                    }
+                </div>
+
+                <div class="receipt-total d-flex justify-content-between fw-bold border-top pt-2">
+                    <span>Total</span>
+                    <span>Rp ${Number(transaction.total).toLocaleString('id-ID')}</span>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <p>Terima kasih atas kepercayaan Anda!</p>
+                    <p>Barang akan siap dalam 1–2 hari kerja</p>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('modal-content').innerHTML = receiptHtml;
+    }
+</script>
+
+<script>
+
+    function printReceipt() {
+        const receiptContent = document.getElementById('modal-content').innerHTML;
+
+        // Buat jendela popup baru
+        const printWindow = window.open('', '', 'height=600,width=400');
+
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Cetak Struk</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            font-size: 14px;
+                            padding: 20px;
+                        }
+                        .receipt-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .receipt-item, .receipt-total {
+                            display: flex;
+                            justify-content: space-between;
+                            margin-bottom: 5px;
+                        }
+                        .receipt-total {
+                            font-weight: bold;
+                            border-top: 1px dashed #000;
+                            padding-top: 10px;
+                        }
+                    </style>
+                </head>
+                <body onload="window.print(); window.close();">
+                    ${receiptContent}
+                </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+    }
+</script>
+
 
 {{-- <script>
 

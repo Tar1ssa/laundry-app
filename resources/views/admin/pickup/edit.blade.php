@@ -48,7 +48,7 @@
                                         <select class="form-control" name="customer_pickup" id="" {{$edit->id_customer  ? 'disabled': ''}}>
                                             <option value="" {{$edit->customerName ? '': 'selected disabled'}}>--Pilih customer</option>
                                             @foreach ($customers as $keycustomer)
-                                                <option value="{{$keycustomer->id}}" {{$keycustomer->id == $edit->customerName->id ? 'selected' : ''}}>{{$keycustomer->customer_name}}</option>
+                                                <option value="{{ $keycustomer->id }}" {{$keycustomer->id == $edit->id_customer ? 'selected' : ''}}>{{$keycustomer->customer_name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -61,6 +61,10 @@
                             <div class="mb-3 form-group">
                                 <label for="" class="col-form-label text-lg-end">Tanggal pickup</label>
                                 <input value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}" type="date" class="form-control" id="floatinEmail" placeholder="" name="pickup_date" readonly>
+                            </div>
+                            <div class="mb-3 form-group">
+                                <label for="" class="col-form-label text-lg-end">Status order</label>
+                                <input value="{{ $order_status }}" type="text" class="form-control" id="floatinEmail" placeholder="" name="" readonly>
                             </div>
                         </div>
                     </div>
