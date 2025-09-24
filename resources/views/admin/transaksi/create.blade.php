@@ -277,14 +277,19 @@ const totalEl = document.getElementById('total');
 const bayarEl = document.getElementById('order_pay');
 const kembalianEl = document.getElementById('order_change');
 
+
 // hitung total dari semua hidden subtotals
 function recalcTotal() {
   let total = 0;
+  const tax = 0.05;
+  let aftertax = 0;
   document.querySelectorAll("input[name='subtotali[]']").forEach(inp => {
     total += parseFloat(inp.value) || 0;
   });
 
-  totalEl.value = total.toFixed(0); // atau tanpa .toFixed jika mau number asli
+  taxtotal = total*tax;
+  aftertax = total - taxtotal;
+  totalEl.value = aftertax.toFixed(0); // atau tanpa .toFixed jika mau number asli
   recalcKembalian();
 }
 

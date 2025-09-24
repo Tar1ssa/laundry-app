@@ -57,7 +57,7 @@
                 {{-- <span class="badge bg-light-success border border-success">
                     <i class="ti ti-trending-up"></i> 70.5%</span> --}}
                 </h4>
-              {{-- <p class="mb-0 text-muted text-sm">You made an extra <span class="text-success">8,900</span> this year</p> --}}
+              <p class="mb-0 text-muted text-sm">Dari tanggal {{ $hari_pertama }}  Sampai tanggal {{ $hari_terakhir }}</p>
             </div>
           </div>
         </div>
@@ -133,6 +133,20 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover table-borderless mb-0">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label class="label-form" for="">Dari bulan</label>
+                            <input type="date" name="from" id="from" class="form-control-sm">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="label-form" for="">Hingga bulan</label>
+                            <input type="date" name="to" id="to" class="form-control-sm">
+                            <button class="btn btn-sm btn-shadow btn-primary" onclick="filterByMonth()">Filter</button>
+                            <button class="btn btn-sm btn-secondary" onclick="resetFilter()">Reset</button>
+                        </div>
+
+
+                    </div>
                   <thead>
                     <tr>
                       <th>No.</th>
@@ -145,11 +159,11 @@
                   <tbody>
                     @foreach ( $services as $index => $keyservice)
 
-                    <tr>
+                    <tr data-date="{{ $keyservice->order_dates }}">
                       <td>{{ $index += 1 }}</td>
                       <td>{{ $keyservice->service_name }}</td>
                       <td>{{ $keyservice->total_qty }}</td>
-                      <td class="text-end">{{ $keyservice->total_revenue }}</td>
+                      <td class="text-end">{{ "Rp.". number_format($keyservice->total_revenue, 2, ',','.')  }}</td>
                     </tr>
                     @endforeach
                   </tbody>
@@ -248,4 +262,61 @@
         </div> --}}
       </div>
     </div>
+@endsection
+
+@section('js')
+<script>
+  function filterByMonth() {
+    const fromElem = document.getElementById('from');
+    const toElem = document.getElementById('to');
+
+    if (!fromElem || !toElem) {
+        console.error("Element 'from' or 'to' not found in DOM.");
+        return;
+    }
+
+    const fromInput = fromElem.value;
+    const toInput = toElem.value;
+
+    const rows = document.querySelectorAll('table tbody tr');
+
+    rows.forEach(row => {
+      const rowDateStr = row.getAttribute('data-date'); // format: yyyy-mm-dd
+      if (!rowDateStr) {
+        row.style.display = 'none';
+        return;
+      }
+
+      const rowDate = new Date(rowDateStr);
+      const fromDate = fromInput ? new Date(fromInput + "-01") : null;
+      const toDate = toInput ? new Date(toInput + "-01") : null;
+
+      let show = true;
+
+      if (fromDate && rowDate < fromDate) {
+        show = false;
+      }
+      if (toDate) {
+        const lastDayOfToMonth = new Date(toDate.getFullYear(), toDate.getMonth() + 1, 0);
+        if (rowDate > lastDayOfToMonth) {
+          show = false;
+        }
+      }
+
+      row.style.display = show ? "" : "none";
+    });
+  }
+</script>
+
+
+
+<script>
+  function resetFilter() {
+    document.getElementById('from').value = '';
+    document.getElementById('to').value = '';
+    const rows = document.querySelectorAll('table tbody tr');
+    rows.forEach(row => row.style.display = '');
+  }
+</script>
+
 @endsection

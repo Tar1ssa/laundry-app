@@ -720,6 +720,8 @@
             const cartItems = document.getElementById('cartItems');
             const cartSection = document.getElementById('cartSection');
             const totalAmount = document.getElementById('totalAmount');
+            const tax = 0.05;
+            let aftertax = 0;
 
             if (cart.length === 0) {
                 cartSection.style.display = 'none';
@@ -746,10 +748,13 @@
                     </tr>
                 `;
                 total += item.subtotal;
+                aftertax = total * tax;
             });
 
+
+            console.log('after tax',aftertax);
             cartItems.innerHTML = html;
-            totalAmount.textContent = `Rp ${total.toLocaleString()}`;
+            totalAmount.textContent = `Rp ${aftertax}`;
         }
 
         function removeFromCart(itemId) {
@@ -790,12 +795,20 @@
             const customerPhone = document.getElementById('customerPhone').value;
             const customerAddress = document.getElementById('customerAddress').value;
 
+
             if (!customerName || !customerPhone || cart.length === 0) {
                 alert('Mohon lengkapi data pelanggan dan pastikan ada item di keranjang!');
                 return;
             }
 
             const total = cart.reduce((sum, item) => sum + item.subtotal, 0);
+            const taxUpload = 0.05;
+            let taxvalueUpload = 0;
+            let totalbayarUpload = 0;
+
+            taxvalueUpload = total * taxUpload;
+            totalbayarUpload = total + taxvalueUpload;
+            console.log('upload',totalbayarUpload);
 
             const transaction = {
                 id: TransCode, // harus sama dengan yang divalidasi Laravel
@@ -806,8 +819,9 @@
                     address: customerAddress
                 },
                 items: [...cart],
-                total: total,
+                total: totalbayarUpload,
                 order_date: new Date().toISOString(),
+                tax: taxvalueUpload,
                 order_status: 1
             };
             console.log('transaksi terkirim',transaction);
@@ -839,6 +853,13 @@
         }
 
         function showReceipt(transaction) {
+            // const taxStruk = 0.05;
+            // let taxvalueStruk = 0;
+            // let totalbayarStruk = 0;
+            // taxvalueStruk = transaction.total * taxStruk;
+            // totalbayarStruk = transaction.total + taxvalueStruk;
+            // console.log('struk',taxvalueStruk);
+            // console.log(transaction);
             const receiptHtml = `
                 <div class="receipt">
                     <div class="receipt-header">
@@ -867,6 +888,7 @@
                     <div class="receipt-total">
                         <div class="receipt-item">
                             <span>TOTAL:</span>
+                            <span>Tax: Rp ${transaction.tax.toLocaleString()}</span>
                             <span>Rp ${transaction.total.toLocaleString()}</span>
                         </div>
                     </div>
@@ -1276,7 +1298,9 @@
 
             let html = '';
             let total = 0;
-
+            const tax = 0.05;
+            let aftertax = 0;
+            let totaltax = 0;
             cart.forEach(item => {
                 const unit = item.service.includes('Sepatu') ? 'pasang' :
                            item.service.includes('Karpet') ? 'm²' : 'kg';
@@ -1300,10 +1324,12 @@
                     </tr>
                 `;
                 total += item.subtotal;
+                aftertax = total * tax;
             });
-
+            console.log(aftertax);
+            totaltax = total + aftertax;
             cartItems.innerHTML = html;
-            totalAmount.textContent = `Rp ${total.toLocaleString()}`;
+            totalAmount.textContent = `Rp ${totaltax.toLocaleString()}`;
         }
 
         // Add some sample data for demonstration

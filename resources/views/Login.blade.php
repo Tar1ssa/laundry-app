@@ -44,7 +44,7 @@
     <div class="auth-wrapper v3">
       <div class="auth-form">
         <div class="auth-header">
-            <h3>LaundryMyAdmin</h3>
+            <h3>Laundry Umar Aziz</h3>
           {{-- <a href="#"><img src="../assets/images/logo-dark.svg" alt="img"></a> --}}
         </div>
         <form action="{{route('actionLogin')}}" method="post">

@@ -20,6 +20,10 @@ class LaporanController extends Controller
 
         // Total transaksi bulan ini
         $currentMonth = Carbon::now()->month;
+        $hari_pertama = Carbon::now()->startOfMonth()->format('d-m-Y');
+        $hari_terakhir = Carbon::now()->endOfMonth()->format('d-m-Y');
+        $display_month = Carbon::now()->format('d M');
+        // $first_month = $display_month->first();
         $currentYear = Carbon::now()->year;
         $transactionsThisMonth = Trans_order::whereYear('order_date', $currentYear)
             ->whereMonth('order_date', $currentMonth)
@@ -30,16 +34,21 @@ class LaporanController extends Controller
             ->whereMonth('order_date', $currentMonth)
             ->sum('total');
 
-        $services = Type_of_service::with('orderDetails')->get();
+        $services = Type_of_service::with('orderDetails.order')->get();
 
         $services->transform(function ($service) {
             $service->total_qty = $service->orderDetails->count('id');
             $service->total_revenue = $service->orderDetails->sum('subtotal');
+
+            // Mengambil semua order_date dari orderDetails
+            $service->order_dates = $service->orderDetails->map(function ($orderDetail) {
+                return $orderDetail->order->order_date ?? null;
+            })->filter()->values(); // filter() untuk menghapus null
             return $service;
         });
 
-        // return $services;
-        return view('admin.laporan.index', compact('totalTransactions', 'transactionsThisMonth', 'incomeThisMonth', 'services'));
+        // return $services->order_dates;
+        return view('admin.laporan.index', compact('totalTransactions', 'transactionsThisMonth', 'incomeThisMonth', 'services', 'hari_pertama', 'hari_terakhir'));
     }
 
     /**
