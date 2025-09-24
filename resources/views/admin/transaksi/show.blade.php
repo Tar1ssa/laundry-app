@@ -101,6 +101,7 @@
                                 <input type="hidden" name="totalhidden" id="totalhidden" class="form-control" readonly>
                                 <input type="number" name="total" id="total" class="form-control" readonly>
                                 </div>
+                                <small>Tax: 5%</small>
                             </div>
                             <div class="mb-3">
                                 <label for="" class="form-label">Bayar</label>
@@ -158,6 +159,8 @@ const kembalianEl = document.getElementById('order_change');
 
 function recalcTotal() {
   let total = 0;
+   const tax = 0.05;
+  let aftertax = 0;
   tbody.querySelectorAll('tr').forEach(row => {
     const subtotalCell = row.querySelector('td:nth-child(5)');
     if (subtotalCell) {
@@ -165,8 +168,10 @@ function recalcTotal() {
     }
   });
 
-  totalEl.value = total.toFixed(0);
-  recalcKembalian();
+    taxtotal = total*tax;
+    aftertax = total + taxtotal;
+    totalEl.value = aftertax.toFixed(0);
+    recalcKembalian();
 }
 
 function recalcKembalian() {

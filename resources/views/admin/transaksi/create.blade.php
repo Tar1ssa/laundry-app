@@ -97,9 +97,9 @@
                                 <label for="" class="form-label">Total</label>
                                 <div class="d-flex flex-row">
                                 <div class="input-group-text">Rp.</div>
-
                                 <input type="number" name="total" id="total" class="form-control" readonly>
-                                </div>
+                            </div>
+                            <small>Tax: 5%</small>
                             </div>
                             <div class="mb-3">
                                 <label for="" class="form-label">Bayar</label>
@@ -288,7 +288,7 @@ function recalcTotal() {
   });
 
   taxtotal = total*tax;
-  aftertax = total - taxtotal;
+  aftertax = total + taxtotal;
   totalEl.value = aftertax.toFixed(0); // atau tanpa .toFixed jika mau number asli
   recalcKembalian();
 }

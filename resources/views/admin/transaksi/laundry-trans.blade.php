@@ -516,6 +516,7 @@
                     <div class="total-section">
                         <h3>Total Pembayaran</h3>
                         <div class="total-amount" id="totalAmount">Rp 0</div>
+                        <small>(Pajak 5%)</small>
                         <button class="btn btn-success" onclick="processTransaction()" style="width: 100%; margin-top: 15px;">
                             💳 Proses Transaksi
                         </button>

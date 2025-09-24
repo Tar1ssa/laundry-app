@@ -34,7 +34,7 @@
               <a href="#!" class="pc-link">User<span class="pc-arrow"><i data-feather="chevron-right"></i></span></a>
               <ul class="pc-submenu">
                 <li class="pc-item"><a class="pc-link" href="{{ route('user.index') }}">Users</a></li>
-                {{-- <li class="pc-item"><a class="pc-link" href="{{ route('level.index') }}">Levels</a></li> --}}
+                <li class="pc-item"><a class="pc-link" href="{{ route('level.index') }}">Levels</a></li>
               </ul>
             </li>
           </ul>

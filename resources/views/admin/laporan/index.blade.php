@@ -12,7 +12,7 @@
                 <h5 class="m-b-10">Home</h5>
               </div>
               <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="../dashboard/index.html">Home</a></li>
+                <li class="breadcrumb-item"><a href="">Home</a></li>
                 <li class="breadcrumb-item" aria-current="page"><a href="javascript: void(0)">Laporan</a></li>
               </ul>
             </div>
@@ -52,23 +52,17 @@
         <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Transaksi Bulan Ini</h6>
-              <h4 class="mb-3">{{ $transactionsThisMonth }}
-                {{-- <span class="badge bg-light-success border border-success">
-                    <i class="ti ti-trending-up"></i> 70.5%</span> --}}
-                </h4>
-              <p class="mb-0 text-muted text-sm">Dari tanggal {{ $hari_pertama }}  Sampai tanggal {{ $hari_terakhir }}</p>
+                <h6 class="mb-2 f-w-400 text-muted">Transaksi Periode Ini</h6>
+                <h4 class="mb-3">{{ $transactionsThisRange }}</h4>
+                <p class="mb-0 text-muted text-sm">Dari tanggal {{ $hari_pertama }} sampai {{ $hari_terakhir }}</p>
             </div>
           </div>
         </div>
         <div class="col-md-6 col-xl-3">
           <div class="card">
             <div class="card-body">
-              <h6 class="mb-2 f-w-400 text-muted">Pendapatan Bulan ini</h6>
-              <h4 class="mb-3">{{ "Rp.". number_format($incomeThisMonth, 2, ',','.')  }}
-                {{-- <span class="badge bg-light-warning border border-warning"><i class="ti ti-trending-down"></i> 27.4%</span> --}}
-            </h4>
-              {{-- <p class="mb-0 text-muted text-sm">You made an extra <span class="text-warning">1,943</span> this year</p> --}}
+                <h6 class="mb-2 f-w-400 text-muted">Pendapatan Periode Ini</h6>
+                <h4 class="mb-3">{{ "Rp.". number_format($incomeThisRange, 2, ',','.')  }}</h4>
             </div>
           </div>
         </div>
@@ -83,7 +77,7 @@
             </div>
           </div>
         </div> --}}
-        </div>
+
 
 
         {{-- <div class="col-md-12 col-xl-8">
@@ -133,17 +127,21 @@
             <div class="card-body">
               <div class="table-responsive">
                 <table class="table table-hover table-borderless mb-0">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="label-form" for="">Dari bulan</label>
-                            <input type="date" name="from" id="from" class="form-control-sm">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="label-form" for="">Hingga bulan</label>
-                            <input type="date" name="to" id="to" class="form-control-sm">
-                            <button class="btn btn-sm btn-shadow btn-primary" onclick="filterByMonth()">Filter</button>
-                            <button class="btn btn-sm btn-secondary" onclick="resetFilter()">Reset</button>
-                        </div>
+                    <div class=" d-flex justify-content-center gap-2">
+                       <form method="GET" action="{{ route('laporan.index') }}" >
+                            <div class="col-md-3">
+                                <label>Dari Tanggal</label>
+                                <input type="date" name="from" value="{{ request('from') }}" class="form-control">
+                            </div>
+                            <div class="col-md-3">
+                                <label>Hingga Tanggal</label>
+                                <input type="date" name="to" value="{{ request('to') }}" class="form-control">
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary me-2">Filter</button>
+                                <a href="{{ route('laporan.index') }}" class="btn btn-secondary">Reset</a>
+                            </div>
+                        </form>
 
 
                     </div>
@@ -157,16 +155,15 @@
                     </tr>
                   </thead>
                   <tbody>
-                    @foreach ( $services as $index => $keyservice)
-
-                    <tr data-date="{{ $keyservice->order_dates }}">
-                      <td>{{ $index += 1 }}</td>
-                      <td>{{ $keyservice->service_name }}</td>
-                      <td>{{ $keyservice->total_qty }}</td>
-                      <td class="text-end">{{ "Rp.". number_format($keyservice->total_revenue, 2, ',','.')  }}</td>
+                    @foreach ($services as $index => $keyservice)
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $keyservice->service_name }}</td>
+                        <td>{{ $keyservice->total_qty }}</td>
+                        <td class="text-end">{{ "Rp.". number_format($keyservice->total_revenue, 2, ',', '.') }}</td>
                     </tr>
                     @endforeach
-                  </tbody>
+                    </tbody>
                 </table>
               </div>
             </div>

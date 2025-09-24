@@ -25808,7 +25808,8 @@ select.form-control[data-multiselectsplitter-secondselect-selector] {
 
 .auth-main .auth-wrapper.v3 .auth-form {
     flex-direction: column;
-    background: url("../images/authentication/img-auth-bg.svg");
+    background: linear-gradient(30deg,rgba(42, 123, 155, 1) 19%, rgba(87, 199, 133, 1) 66%, rgba(237, 221, 83, 1) 100%);
+    /* background: url("../images/login.jpg"); */
     min-height: 100vh;
     padding: 24px;
     background-repeat: no-repeat;

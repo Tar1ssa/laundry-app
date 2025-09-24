@@ -13,43 +13,47 @@ class LaporanController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // Total transaksi (jumlah order)
-        $totalTransactions = Trans_order::count();
+        // ambil input user
+    $from = $request->input('from');
+    $to = $request->input('to');
 
-        // Total transaksi bulan ini
-        $currentMonth = Carbon::now()->month;
-        $hari_pertama = Carbon::now()->startOfMonth()->format('d-m-Y');
-        $hari_terakhir = Carbon::now()->endOfMonth()->format('d-m-Y');
-        $display_month = Carbon::now()->format('d M');
-        // $first_month = $display_month->first();
-        $currentYear = Carbon::now()->year;
-        $transactionsThisMonth = Trans_order::whereYear('order_date', $currentYear)
-            ->whereMonth('order_date', $currentMonth)
-            ->count();
-
-        // Pendapatan bulan ini (sum total dari transaksi bulan ini)
-        $incomeThisMonth = Trans_order::whereYear('order_date', $currentYear)
-            ->whereMonth('order_date', $currentMonth)
-            ->sum('total');
-
-        $services = Type_of_service::with('orderDetails.order')->get();
-
-        $services->transform(function ($service) {
-            $service->total_qty = $service->orderDetails->count('id');
-            $service->total_revenue = $service->orderDetails->sum('subtotal');
-
-            // Mengambil semua order_date dari orderDetails
-            $service->order_dates = $service->orderDetails->map(function ($orderDetail) {
-                return $orderDetail->order->order_date ?? null;
-            })->filter()->values(); // filter() untuk menghapus null
-            return $service;
-        });
-
-        // return $services->order_dates;
-        return view('admin.laporan.index', compact('totalTransactions', 'transactionsThisMonth', 'incomeThisMonth', 'services', 'hari_pertama', 'hari_terakhir'));
+    // default: bulan ini
+    if (!$from || !$to) {
+        $from = Carbon::now()->startOfMonth()->toDateString();
+        $to = Carbon::now()->endOfMonth()->toDateString();
     }
+
+     // total transaksi seluruhnya
+    $totalTransactions = Trans_order::count();
+
+    // transaksi & income dalam range
+    $transactionsThisRange = Trans_order::whereBetween('order_date', [$from, $to])->count();
+    $incomeThisRange       = Trans_order::whereBetween('order_date', [$from, $to])->sum('total');
+
+    // statistik layanan sesuai range
+    $services = Type_of_service::with(['orderDetails' => function ($q) use ($from, $to) {
+        $q->whereHas('order', function ($query) use ($from, $to) {
+            $query->whereBetween('order_date', [$from, $to]);
+        });
+    }, 'orderDetails.order'])->get();
+
+    $services->transform(function ($service) {
+        $service->total_qty = $service->orderDetails->count('id');
+        $service->total_revenue = $service->orderDetails->sum('subtotal');
+        return $service;
+    });
+
+    return view('admin.laporan.index', [
+        'totalTransactions' => $totalTransactions,
+        'transactionsThisRange' => $transactionsThisRange,
+        'incomeThisRange' => $incomeThisRange,
+        'services' => $services,
+        'hari_pertama' => Carbon::parse($from)->format('d-m-Y'),
+        'hari_terakhir' => Carbon::parse($to)->format('d-m-Y'),
+    ]);
+}
 
     /**
      * Show the form for creating a new resource.
