@@ -51,6 +51,9 @@
 
             </ul>
         </li>
+          <li class="pc-item ">
+          <a href="{{ route('customer.index') }}" class="pc-link"><span class="pc-micon"><i class="ti ti-user"></i></span><span class="pc-mtext">Customer</span></a>
+        </li>
         @endif
 
         @if (auth()->check() && auth()->user()->isPimpinan())

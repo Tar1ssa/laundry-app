@@ -15,5 +15,10 @@ class Customer extends Model
         'address',
     ];
 
+    public function transaction()
+    {
+        return $this->hasMany(Trans_order::class, 'id_customer', 'id');
+    }
+
     protected $date = ['deleted_at'];
 }

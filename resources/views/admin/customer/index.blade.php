@@ -66,7 +66,7 @@
                         {{--<a href="{{ route('Customer.index', ['edit' => $dataCustomer->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            {{-- <a href="#" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></a> --}}
+                            <button type="button" onclick='customerHistoryOpen(@json($dataCustomer))' data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></button>
                             <a href="{{ route('customer.edit', $dataCustomer->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div> </a>
                             <form onclick="return confirm('Yakin ingin menghapus {{ $dataCustomer->customer_name }} ?')" action="{{ route('customer.destroy', $dataCustomer->id) }}" method="post" class="d-inline">
                                     @csrf
@@ -87,6 +87,29 @@
         </div>
         <!-- [ Main Content ] end -->
       </div>
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="staticBackdropLabel">Riwayat Transaksi</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="customerHistory">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 {{-- @section('modal-create')
@@ -238,5 +261,61 @@
 
 
 
+    </script>
+
+    <script>
+        function customerHistoryOpen(transaksi) {
+            const detailTrans = @json(route('transaksi.show', ':id'));
+            const historyHtml = `
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <div class="mb-3">
+                            <label  class="form-label">Nama</label>
+                            <input class="form-control" type="text" readonly value="${transaksi.customer_name}" name="" id="">
+                        </div>
+                        <div class="mb-3">
+                            <label  class="form-label">No.Telp</label>
+                            <input class="form-control" type="number" readonly value="${transaksi.phone}" name="" id="">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="" class="form-label">Alamat</label>
+                        <textarea name="" id="" cols="10" rows="5" class="form-control" readonly>${transaksi.address}</textarea>
+                    </div>
+                </div>
+                <div class="row">
+                    <table id="new-cons" class="display table table-striped table-hover dt-responsive nowrap" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>No.</th>
+                                <th>Nomor Transaksi</th>
+                                <th>Tanggal Order</th>
+                                <th>Tanggal Selesai</th>
+                                <th>Total</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${
+                            transaksi.transaction?.map((item, index) => `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${item.order_code}</td>
+                                <td>${item.order_date}</td>
+                                <td>${item.order_end_date ? item.order_end_date : 'transaksi belum selesai'}</td>
+                                <td>Rp.${Number(item.total).toLocaleString('id-ID')}</td>
+                                <td><a href="${detailTrans.replace(':id', item.id)}" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-history text-white fs-5  "></i>Detail transaksi</div></a></td>
+                            </tr>
+                            `).join('') ?? '<tr><td colspan="6"><em>Tidak ada item</em></td></tr>'
+                            }
+
+
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            console.log(transaksi);
+            document.getElementById('customerHistory').innerHTML = historyHtml;
+        }
     </script>
 @endsection

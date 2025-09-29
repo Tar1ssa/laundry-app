@@ -30,8 +30,13 @@ Route::middleware('auth')->group(function () {
         Route::resource('user', UserController::class);
         Route::resource('level', LevelController::class);
         Route::resource('service', ServiceController::class);
-        Route::resource('customer', CustomerController::class);
+
         // End Master Data
+    });
+
+    Route::middleware('role:Administrator,Operator')->group(function () {
+
+        Route::resource('customer', CustomerController::class);
     });
 
     Route::middleware('role:Operator')->group(function () {
