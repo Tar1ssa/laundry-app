@@ -38,7 +38,7 @@
                         <div class="col-md-6">
                                 <div class="mb-3">
                                     <div class="form-floating ">
-                                        <input value="{{ $edit->name ? $edit->customer_name : old('name') }}" type="text" class="form-control" id="floatingName" placeholder="Nama" name="name">
+                                        <input value="{{ $edit->customer_name ? $edit->customer_name : old('name') }}" type="text" class="form-control" id="floatingName" placeholder="Nama" name="name">
                                         <label for="floatingName">Nama</label>
                                     </div>
                                 </div>

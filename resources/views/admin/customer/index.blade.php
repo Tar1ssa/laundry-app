@@ -61,12 +61,15 @@
                         <td>{{ $first}}</td>
                         <td>{{ $last }}</td>
                         <td>{{ $dataCustomer->address }}</td>
-                        <td>{{ $dataCustomer->phone }}</td>
+                        <td>{{ $dataCustomer->phone }}s</td>
                         <td>
                         {{--<a href="{{ route('Customer.index', ['edit' => $dataCustomer->id]) }}" class="btn btn-sm btn-warning">
                             Edit
                             </a> --}}
-                            <button type="button" onclick='customerHistoryOpen(@json($dataCustomer))' data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></button>
+
+
+                            <button type="button" onclick='customerHistoryOpen(@json($dataCustomer))' data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="btn btn-shadow btn-success"><div class="d-flex justify-content-center gap-2 text-center align-items-center"><i class="ti ti-history fs-5 text-white"></i> Riwayat transaksi</div></button>
+
                             <a href="{{ route('customer.edit', $dataCustomer->id) }}" class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-edit fs-5 text-white"></i>Edit</div> </a>
                             <form onclick="return confirm('Yakin ingin menghapus {{ $dataCustomer->customer_name }} ?')" action="{{ route('customer.destroy', $dataCustomer->id) }}" method="post" class="d-inline">
                                     @csrf

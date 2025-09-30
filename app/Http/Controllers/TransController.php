@@ -206,15 +206,15 @@ class TransController extends Controller
     public function done(Request $request, string $id)
     {
         $done = Trans_order::find($id);
-        $done->order_status = 3;
+        $done->order_status = $request->orderNewStatus;
         $done->save();
         if ($done->order_status == 3 && $done->order_end_date) {
             Trans_laundry_pickup::create([
                 'id_order' => $done->id
             ]);
         }
-        Alert::success('Sukses!', 'Order siap diambil!');
-        return redirect()->back()->with('Sukses!', 'Order siap diambil!');
+        Alert::success('Sukses!', 'Order status berhasil diubah!');
+        return redirect()->back()->with('Sukses!', 'Order status berhasil diubah!');
     }
 
     /**

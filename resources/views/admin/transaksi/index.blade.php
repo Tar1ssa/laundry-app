@@ -116,12 +116,12 @@
                                 Print Struk
                             </button>
                             @endif
-                            <form onclick="return confirm('Yakin ingin menandai transaksi {{ $dataTransaksi->order_code }} siap diambil ?')" action="{{ route('transaksi.done', $dataTransaksi->id) }}" method="post" class="d-inline">
+                            <button type="button" onclick='statusChangeOpen(@json($dataTransaksi))' class="btn btn-shadow btn-warning"  data-bs-toggle="modal" data-bs-target="#changeStatus"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-checkbox fs-5 text-white"></i>Ubah status</div></button>
+                            {{-- <form onclick="return confirm('Yakin ingin menandai transaksi {{ $dataTransaksi->order_code }} siap diambil ?')" action="{{ route('transaksi.done', $dataTransaksi->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('PUT')
-                                <button class="btn btn-shadow btn-warning"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-check fs-5 text-white"></i>Tandai siap diambil</div></button>
 
-                            </form>
+                            </form> --}}
                             <a href="{{route('transaksi.show',$dataTransaksi->id)}}" class="btn btn-shadow {{ $dataTransaksi->order_end_date ? "btn-success" : 'btn-outline-success' }} "><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti {{ $dataTransaksi->order_end_date ? "ti-history text-white" : 'ti-cash text-green' }}  fs-5  "></i>{{ $dataTransaksi->order_end_date ? "Detail transaksi" : 'Bayar transaksi' }}</div></a>
                             <form onclick="return confirm('Yakin ingin membatalkan {{ $dataTransaksi->order_code }} ?')" action="{{ route('transaksi.destroy', $dataTransaksi->id) }}" method="post" class="d-inline">
                                     @csrf
@@ -143,8 +143,19 @@
         <!-- [ Main Content ] end -->
       </div>
 
-      <!-- Button trigger modal -->
+{{-- changeStatus Modal --}}
+<!-- Button trigger modal -->
 
+
+<!-- Modal -->
+<div class="modal fade" id="changeStatus" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="changeStatusLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" id="changeStatusModal">
+
+    </div>
+  </div>
+</div>
+{{-- end changeStatus Modal --}}
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -266,6 +277,7 @@
 
 <script>
     function showReceipt(transaction) {
+        console.log(transaction);
         const receiptHtml = `
             <div class="receipt">
                 <div class="receipt-header">
@@ -284,9 +296,9 @@
                 <div style="margin-bottom: 20px;">
                     <strong>Detail Pesanan:</strong><br>
                     ${
-                        transaction.detailOrder?.map(item => `
+                        transaction.detail_order?.map(item => `
                             <div class="receipt-item d-flex justify-content-between">
-                                <span>${item.service?.service_name ?? 'Layanan tidak diketahui'} (${item.weight} kg)</span>
+                                <span>${item.service?.service_name ?? 'Layanan tidak diketahui'} (${item.qty} kg)</span>
                                 <span>Rp ${Number(item.subtotal).toLocaleString('id-ID')}</span>
                             </div>
                         `).join('') ?? '<em>Tidak ada item</em>'
@@ -353,7 +365,41 @@
     }
 </script>
 
+<script>
+    function statusChangeOpen(transaksi) {
+        const changeStatusRoute = @json(route('transaksi.done', ':id'));
+        const changeStatusHtml = `
+            <form action="${changeStatusRoute.replace(':id', transaksi.id)}" method="post">
+                @csrf
+                @method('PUT')
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="changeStatusLabel">Ubah Status</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+                <div class="modal-body" >
+                    <div class="mb-3">
+                        <h2 class="fw-bold">${transaksi.order_code}</h2>
+                        <h3 class="fw-bold">${transaksi.customer.customer_name}</h3>
+                        <p></p>
+                    </div>
+                    <label for="" class="form-label">Pilih status baru:</label>
+                    <select name="orderNewStatus" class="form-control" id="">
+                        <option value="1"  ${transaksi.order_status == 1 ? 'selected' : ''}>Menunggu</option>
+                        <option value="2"  ${transaksi.order_status == 2 ? 'selected' : ''}>Proses</option>
+                        <option value="3"  ${transaksi.order_status == 3 ? 'selected' : ''}>Siap diambil</option>
+                        <option value="4"  ${transaksi.order_status == 4 ? 'selected' : ''}>Selesai</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="submit" class="btn btn-primary">Simpan</button>
+                </div>
+            </form>
+        `;
 
+        document.getElementById('changeStatusModal').innerHTML = changeStatusHtml;
+    }
+</script>
 {{-- <script>
 
 
