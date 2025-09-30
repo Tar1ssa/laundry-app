@@ -123,12 +123,14 @@
 
                             </form> --}}
                             <a href="{{route('transaksi.show',$dataTransaksi->id)}}" class="btn btn-shadow {{ $dataTransaksi->order_end_date ? "btn-success" : 'btn-outline-success' }} "><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti {{ $dataTransaksi->order_end_date ? "ti-history text-white" : 'ti-cash text-green' }}  fs-5  "></i>{{ $dataTransaksi->order_end_date ? "Detail transaksi" : 'Bayar transaksi' }}</div></a>
+                            @if (!((in_array($dataTransaksi->order_status, [3, 4])) && $dataTransaksi->order_end_date))
+
                             <form onclick="return confirm('Yakin ingin membatalkan {{ $dataTransaksi->order_code }} ?')" action="{{ route('transaksi.destroy', $dataTransaksi->id) }}" method="post" class="d-inline">
                                     @csrf
                                     @method('DELETE')
                                 <button class="btn btn-shadow btn-danger"><div class="d-flex justify-content-center align-items-center gap-2 text-center"><i class="ti ti-trash fs-5 text-white"></i>Batal</div></button>
-
                             </form>
+                            @endif
                         </td>
                       </tr>
                        @endforeach
