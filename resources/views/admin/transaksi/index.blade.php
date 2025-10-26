@@ -101,7 +101,7 @@
                             </ul>
                             </td>
                         <td>
-                            @if ($dataTransaksi->order_pay)
+                            @if ($dataTransaksi->order_end_date)
                                 @php
                                     $total = $dataTransaksi->detailOrder->sum('subtotal');
                                     $dataWithTotal = $dataTransaksi->toArray();

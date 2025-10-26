@@ -12,6 +12,9 @@ use App\Models\Type_of_service;
 use Illuminate\Support\Facades\DB;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\StoreTransactionRequest;
+use App\Services\TransactionService;
 use Pest\ArchPresets\Custom;
 
 class TransController extends Controller
@@ -54,89 +57,34 @@ class TransController extends Controller
         return view('admin.transaksi.create', compact('title', 'service', 'customer', 'trans_number', 'today'));
     }
 
+
+
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    protected $transactionService;
+
+    public function __construct(TransactionService $transactionService)
     {
-        DB::beginTransaction();
+        $this->transactionService = $transactionService;
+    }
+
+    public function store(StoreTransactionRequest $request): RedirectResponse
+    {
+        // request sudah tervalidasi karena menggunakan FormRequest
+        $payload = $request->validated();
+        // jika Anda butuh raw arrays (id_service etc) sudah ada di validated()
 
         try {
+            $order = $this->transactionService->createTransaction($payload);
 
-            $rules = [
-                'id_customer' => 'required',
-                'order_date' => 'required',
-            ];
-
-            $messages = [
-                'id_customer.required' => 'Nama customer tidak dapat kosong.',
-                'order_date.required' => 'Tanggal order tidak dapat kosong.',
-
-            ];
-
-            $validation = Validator::make($request->all(), $rules, $messages);
-
-            if ($validation->fails()) {
-                $errors = $validation->errors();
-
-                // Ambil pesan error spesifik untuk password jika ada
-                if ($errors->has('id_customer')) {
-                    Alert::error('Gagal!', $errors->first('id_customer'));
-                } elseif ($errors->has('order_date')) {
-                    Alert::error('Gagal!', $errors->first('order_date'));
-                } else {
-                    Alert::error('Gagal!', 'Terjadi kesalahan validasi. Silakan periksa kembali.');
-                }
-
-                return redirect()->back()->withErrors($errors)->withInput()->with('sweet_alert', true);
-            }
-
-
-
-            $create = [
-                'id_customer' => $request->id_customer,
-                'order_code' => $request->trans_code,
-                'order_date' => $request->order_date,
-                'order_pay' => $request->order_pay,
-                'order_change' => $request->order_change,
-
-                'total' => $request->total
-            ];
-            if ($request->order_pay > $request->total) {
-                $order_end_date = \Carbon\Carbon::now();
-                $create['order_end_date'] =  $order_end_date;
-            }
-
-            $insertOrder = Trans_order::create($create);
-
-            foreach ($request->id_service as $key => $value) {
-                Trans_order_detail::create([
-                    'id_order' => $insertOrder->id,
-                    'id_service' => $request->id_service[$key],
-                    'qty' => $request->qty[$key],
-                    'subtotal' => $request->subtotali[$key],
-                    'notes'  => $request->note[$key]
-                ]);
-            }
-
-            DB::commit();
             Alert::success('Sukses!', 'Transaksi berhasil dibuat!');
-            return redirect()->to('transaksi')->with('Sukses!', 'Transaksi berhasil dibuat!');
-            // Alert::success('Success', 'Transaksi berhasil dibuat');
-            // return redirect()->to('transactions');
-
-
-            // return redirect()->route('print-borrowed', $insertBorrow->id);
-
-
-            // return to_route('print-borrowed', ['id' => $insertBorrow]);
-
-            // return $insertBorrow->id;
-            // return redirect()->to('print-borrowed', $insertBorrow->id);
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Alert::error('oops!', $th->getMessage());
-            return redirect()->back()->withErrors(['Error' => 'transaksi gagal']);
+            return redirect()->to('transaksi')->with('success', 'Transaksi berhasil dibuat!');
+        } catch (\Throwable $e) {
+            // logging optional: \Log::error($e);
+            Alert::error('Oops!', 'Terjadi kesalahan pada server. Silakan coba lagi.');
+            return redirect()->back()->withInput()->withErrors(['error' => 'Transaksi gagal: ' . $e->getMessage()]);
         }
     }
 

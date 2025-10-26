@@ -63,7 +63,7 @@
           <div class="card">
             <div class="card-body text-center">
               <h6 class="mb-2 f-w-400 text-muted">Order selesai</h6>
-              <h4 class="mb-3">{{ count($order_berjalan)  }}</h4>
+              <h4 class="mb-3">{{ count($order_selesai)  }}</h4>
             </div>
           </div>
         </div>
