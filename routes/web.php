@@ -51,6 +51,9 @@ Route::middleware('auth')->group(function () {
         Route::get('get-transaksi', [TransController::class, 'getTransaksi'])->name('getTransaksi');
         Route::put('/transaksi/{id}/status', [TransController::class, 'setStatus'])->name('setTransaksiStatus');
         Route::get('get-list-layanan', [TransController::class, 'listLayanan']);
+        Route::get('download',[TransController::class, 'download'])->name('download');
+
+
 
 
         // End Transaction

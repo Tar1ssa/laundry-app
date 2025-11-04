@@ -36,6 +36,7 @@
 
                     <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a>
                     <a href="{{ route('laundry.transc') }}" class="btn btn-shadow btn-info">Sistem informasi laundry</a>
+                    <a href="{{ route('download') }}" class="btn btn-shadow btn-info">test api download</a>
                 </div>
                 {{-- end laundry trans button --}}
                 {{-- <a href="{{ route('transaksi.create') }}" class="btn btn-shadow btn-primary">Tambah Transaksi</a> --}}
@@ -44,6 +45,7 @@
                 {{-- <button class="btn btn-shadow btn-primary" type="button" data-bs-toggle="modal" data-bs-target="#create">Tambah Transaksi</button> --}}
               </div>
               <div class="card-body">
+                <img src="{{ $imageUrl }}" alt="Downloaded Image" style="max-width: 300px;">
                 <div class=" table-responsive">
                   <table id="new-cons" class="display table table-striped table-hover dt-responsive nowrap" style="width: 100%">
                     <thead>
@@ -180,94 +182,7 @@
 @endsection
 
 {{-- @section('modal-create')
-<div id="create" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalCenterTitle">Tambah Transaksi</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form action="{{ route('Transaksi.store') }}" method="post" >
-          @csrf
-      <div class="modal-body">
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Nama</label>
-                <input type="text" class="form-control" name="name">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Email</label>
-                <input type="email" class="form-control" name="email" aria-describedby="emailHelp">
-            </div>
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Password</label>
-                <input type="password" class="form-control" name="password" min="8">
-            </div>
 
-            <div class="mb-3">
-                <label for="exampleInputEmail1" class="form-label">Level Transaksi</label>
-                <select class="form-select" aria-label="Default select example" name="level">
-                    <option selected disabled>--Pilih Level--</option>
-                    @foreach ($levels as $keylevel)
-                    <option value="{{ $keylevel->id }}">{{ $keylevel->level_name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary">Submit</button>
-
-      </div>
-    </form>
-    </div>
-  </div>
-</div>
-
-@endsection --}}
-
-{{-- @section('modal-edit')
-@if ($editTransaksi)
-  <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var modal = new bootstrap.Modal(document.getElementById('editModal'));
-      modal.show();
-    });
-  </script>
-@endif --}}
-
-{{-- @if ($editTransaksi)
-    <div id="editModal" class="modal fade show" tabindex="-1" aria-modal="true" style="display: block;" role="dialog">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <form method="POST" action="{{ route('Transaksi.update', $editTransaksi->id) }}">
-        @csrf
-        @method('PUT')
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Transaksi</h5>
-          <a href="{{ route('Transaksi.index') }}" class="btn-close"></a>
-        </div>
-        <div class="modal-body">
-          <input type="text" name="name" class="form-control mb-2" value="{{ $editTransaksi->name }}">
-          <input type="email" name="email" class="form-control mb-2" value="{{ $editTransaksi->email }}">
-          <input type="password" name="password" class="form-control mb-2" placeholder="Kosongkan jika tidak diubah">
-          <select name="level" class="form-select mb-2">
-            @foreach ($levels as $level)
-              <option value="{{ $level->id }}" {{ $editTransaksi->id_level == $level->id ? 'selected' : '' }}>
-                {{ $level->level_name }}
-              </option>
-            @endforeach
-          </select>
-        </div>
-        <div class="modal-footer">
-          <a href="{{ route('Transaksi.index') }}" class="btn btn-secondary">Batal</a>
-          <button type="submit" class="btn btn-primary">Simpan</button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-@endif --}}
 
 
 

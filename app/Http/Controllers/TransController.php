@@ -2,32 +2,43 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage;
+
 use Carbon\Carbon;
 use App\Models\Customer;
 use App\Models\Trans_order;
-use App\Models\Trans_order_detail;
 use Illuminate\Http\Request;
-use App\Models\Trans_laundry_pickup;
+use Pest\ArchPresets\Custom;
+use App\Services\APICallTest;
 use App\Models\Type_of_service;
+use App\Models\Trans_order_detail;
 use Illuminate\Support\Facades\DB;
+use App\Models\Trans_laundry_pickup;
+use App\Services\TransactionService;
+use Illuminate\Http\RedirectResponse;
 use RealRashid\SweetAlert\Facades\Alert;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\StoreTransactionRequest;
-use App\Services\TransactionService;
-use Pest\ArchPresets\Custom;
 
 class TransController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(APICallTest $apiCall)
     {
         $Transaksi = Trans_order::with('customer', 'detailOrder.service')->orderBy('id', 'desc')->get();
         $title = 'Data Transaksi';
-        return view('admin.transaksi.index', compact('Transaksi', 'title'));
+
+        // call service (ensure your service returns an object with ->path and ->body)
+        $result = $apiCall->downloadImage('https://picsum.photos/200/300');
+
+        // Convert storage path to public URL
+        $imageUrl = asset('storage/' . $result);
+
+        return view('admin.transaksi.index', compact('Transaksi', 'title', 'imageUrl'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -64,10 +75,12 @@ class TransController extends Controller
      * Store a newly created resource in storage.
      */
     protected $transactionService;
+    protected APICallTest $apiCall;
 
-    public function __construct(TransactionService $transactionService)
+    public function __construct(TransactionService $transactionService, APICallTest $apiCall)
     {
         $this->transactionService = $transactionService;
+        $this->apiCall = $apiCall;
     }
 
     public function store(StoreTransactionRequest $request): RedirectResponse
@@ -228,14 +241,7 @@ class TransController extends Controller
 
     public function LaundryStore(Request $request)
     {
-        // $request->validate([
-        //     'id' => 'required|string|unique:trans_orders,order_code',
-        //     'customer.id' => 'required|exists:customers,id',
-        //     'items' => 'required|array|min:1',
-        //     'order_date' => 'required|date',
-        //     'order_status' => 'required',
-        //     'total' => 'required|numeric|min:0'
-        // ]);
+
 
         DB::beginTransaction();
 
@@ -349,5 +355,27 @@ class TransController extends Controller
     {
         $service = Type_of_service::all();
         return response()->json($service);
+    }
+
+
+    public function download()
+    {
+        try {
+            $relativePath = $this->apiCall->downloadImage('https://picsum.photos/200/300', 'assets/test');
+
+            // Make a public URL for client
+            $publicUrl = Storage::disk('public')->url($relativePath);
+
+            return response()->json([
+                'ok' => true,
+                'path' => $relativePath,
+                'url' => $publicUrl,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }
